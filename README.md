@@ -23,6 +23,16 @@ npm run build
 
 `build` comprende il controllo TypeScript. `.npmrc` usa una cache locale scrivibile. Il browser Playwright è una risorsa di test, non una dipendenza scaricata dagli utenti del sito.
 
+## Pubblicazione
+
+Elevator è predisposto per GitHub Pages all’indirizzo `https://dadolentini.github.io/Ascensore-v2/`. La pubblicazione è stata autorizzata dall’utente il 9 ottobre 2026.
+
+Il workflow **Pubblica Elevator** si avvia manualmente da **Actions → Pubblica Elevator → Run workflow**, scegliendo `main`. Esegue installazione, test e build prima del deployment. I normali push non pubblicano automaticamente nuove versioni.
+
+Per Pages, **Settings → Pages → Source** deve essere **GitHub Actions**. Il build usa `VITE_BASE_PATH=/Ascensore-v2/`; sviluppo e preview alla radice mantengono la base `/`. Il build produce anche ingressi HTML per `come-funziona/` e `gli-algoritmi/`, così i link diretti e il refresh funzionano sul server statico. Immagini, font, PDF e Web Worker rispettano lo stesso prefisso.
+
+`npm run test:deployment` verifica il sito pubblico con Chromium: link diretti e refresh, PDF originale, risorse, due simulazioni senza reload, esempio interattivo, navigazione e download. È possibile passare un altro indirizzo dopo `--` per verificare prima un server statico locale. Richiede il browser Playwright già installato.
+
 ## Uso
 
 - Configura piani, ascensori e persone; **Distribuisci gli uffici** applica esplicitamente la distribuzione dichiarata. Gli uffici preesistenti non vengono spostati tacitamente quando cambi i piani.

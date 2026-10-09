@@ -1,6 +1,7 @@
 import { Component, Suspense, lazy, useCallback, useEffect, useRef, useState, type ErrorInfo, type ReactNode } from 'react';
 import Landing from './pages/Landing';
 import RouteLink, { NavigationContext } from './components/RouteLink';
+import { fromBasePath, withBasePath } from './navigation/paths';
 
 const Algorithms = lazy(() => import('./pages/Algorithms'));
 const HowItWorks = lazy(() => import('./pages/HowItWorks'));
@@ -22,22 +23,28 @@ function focusLocation() {
   }
 }
 
+function readLocation() {
+  const href = window.location.pathname + window.location.search + window.location.hash;
+  return fromBasePath(href) ?? href;
+}
+
 export default function App() {
-  const [location, setLocation] = useState(() => window.location.pathname + window.location.search + window.location.hash);
+  const [location, setLocation] = useState(readLocation);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
-  const algorithms = location.split(/[?#]/)[0].replace(/\/$/, '') === '/gli-algoritmi';
-  const how = location.split(/[?#]/)[0].replace(/\/$/, '') === '/come-funziona';
+  const algorithms = location.split(/[?#]/)[0].replace(/\/+$/, '') === '/gli-algoritmi';
+  const how = location.split(/[?#]/)[0].replace(/\/+$/, '') === '/come-funziona';
   const secondary = algorithms || how;
   const navigate = useCallback((href: string) => {
-    if (href !== window.location.pathname + window.location.search + window.location.hash) window.history.pushState(null, '', href);
-    setLocation(window.location.pathname + window.location.search + window.location.hash);
+    const destination = withBasePath(href);
+    if (destination !== window.location.pathname + window.location.search + window.location.hash) window.history.pushState(null, '', destination);
+    setLocation(readLocation());
     setMenuOpen(false);
     window.requestAnimationFrame(focusLocation);
   }, []);
 
   useEffect(() => {
-    const handlePop = () => { setLocation(window.location.pathname + window.location.search + window.location.hash); setMenuOpen(false); window.requestAnimationFrame(focusLocation); };
+    const handlePop = () => { setLocation(readLocation()); setMenuOpen(false); window.requestAnimationFrame(focusLocation); };
     window.addEventListener('popstate', handlePop);
     return () => window.removeEventListener('popstate', handlePop);
   }, []);
@@ -63,6 +70,6 @@ export default function App() {
     </div></header>
     <main id="landing-main" tabIndex={-1} hidden={secondary}><Landing/></main>
     {secondary && <main id="information-main" tabIndex={-1}><RouteBoundary key={algorithms ? 'algorithms' : 'how'}><Suspense fallback={<div className="route-message container" role="status"><p className="eyebrow">{algorithms ? 'Gli algoritmi' : 'Come funziona'}</p><h1>Caricamento dell'approfondimento…</h1></div>}>{algorithms ? <Algorithms onReady={focusLocation}/> : <HowItWorks onReady={focusLocation}/>}</Suspense></RouteBoundary></main>}
-    <footer className="site-footer"><div className="container"><div className="footer-top"><RouteLink className="brand" href="/">Elevator</RouteLink><p>La mobilità verticale,<br/>letta attraverso un modello.</p><div><RouteLink className="text-link" href="/gli-algoritmi#fonti">Modello, ipotesi e fonti <span aria-hidden="true">↗︎</span></RouteLink><a className="text-link footer-pdf" href="/model/rapporto_ascensori.pdf" target="_blank" rel="noreferrer">Apri il PDF matematico <span aria-hidden="true">↗︎</span><span className="sr-only"> (nuova scheda)</span></a></div></div><div className="footer-bottom"><p>Scenari sintetici. Uno strumento di studio, non un controllo hardware né una certificazione impiantistica.</p><p>Le immagini sono riferimenti architettonici illustrativi.</p></div></div></footer>
+    <footer className="site-footer"><div className="container"><div className="footer-top"><RouteLink className="brand" href="/">Elevator</RouteLink><p>La mobilità verticale,<br/>letta attraverso un modello.</p><div><RouteLink className="text-link" href="/gli-algoritmi#fonti">Modello, ipotesi e fonti <span aria-hidden="true">↗︎</span></RouteLink><a className="text-link footer-pdf" href={withBasePath('/model/rapporto_ascensori.pdf')} target="_blank" rel="noreferrer">Apri il PDF matematico <span aria-hidden="true">↗︎</span><span className="sr-only"> (nuova scheda)</span></a></div></div><div className="footer-bottom"><p>Scenari sintetici. Uno strumento di studio, non un controllo hardware né una certificazione impiantistica.</p><p>Le immagini sono riferimenti architettonici illustrativi.</p></div></div></footer>
   </NavigationContext.Provider>;
 }
