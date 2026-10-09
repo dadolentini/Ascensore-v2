@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { chromium, expect } from '@playwright/test';
 
-const base=new URL(process.argv[2]||'https://dadolentini.github.io/Ascensore-v2/');
+const base=new URL(process.argv[2]||'https://davidelentini.it/elevator/');
 assert(['http:','https:'].includes(base.protocol),'Use an HTTP(S) site URL.');
 if(!base.pathname.endsWith('/'))base.pathname+='/';
 const browser=await chromium.launch();
@@ -11,6 +11,16 @@ try {
   const errors=[],failedRequests=[];
   page.on('pageerror',error=>errors.push(error.message));
   page.on('response',response=>{if(response.status()>=400)failedRequests.push(`${response.status()} ${response.url()}`);});
+  if(base.pathname.endsWith('/elevator/')) {
+    const siteRoot=new URL(base);
+    siteRoot.pathname=base.pathname.slice(0,-'elevator/'.length);
+    await page.goto(new URL('?from=redirect#simulatore',siteRoot).href,{waitUntil:'networkidle'});
+    await expect(page).toHaveURL(new URL('?from=redirect#simulatore',base).href);
+    for(const route of ['come-funziona','gli-algoritmi']) {
+      await page.goto(new URL(route+'/?from=legacy#contenuto',siteRoot).href,{waitUntil:'networkidle'});
+      await expect(page).toHaveURL(new URL(route+'/?from=legacy#contenuto',base).href);
+    }
+  }
   for(const [route,title] of [['','Il tempo'],['come-funziona/','Una chiamata'],['gli-algoritmi/','Le regole']]) {
     const response=await page.goto(new URL(route,base).href,{waitUntil:'networkidle'});
     assert.equal(response.status(),200,`${route||'Home'} must return HTTP 200.`);

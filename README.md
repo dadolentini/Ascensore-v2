@@ -25,11 +25,11 @@ npm run build
 
 ## Pubblicazione
 
-Elevator è predisposto per GitHub Pages all’indirizzo `https://dadolentini.github.io/Ascensore-v2/`. La pubblicazione è stata autorizzata dall’utente il 9 ottobre 2026.
+L’indirizzo di pubblicazione richiesto per Elevator è `https://davidelentini.it/elevator/`. La pubblicazione e lo spostamento sotto questo percorso sono stati autorizzati dall’utente il 9 ottobre 2026. Il dominio principale reindirizza a `/elevator/`, conservando query e frammento; i vecchi link a «Come funziona» e «Gli algoritmi» reindirizzano alle nuove pagine. I link precedenti ai documenti matematici restano disponibili.
 
 Il workflow **Pubblica Elevator** si avvia manualmente da **Actions → Pubblica Elevator → Run workflow**, scegliendo `main`. Esegue installazione, test e build prima del deployment. I normali push non pubblicano automaticamente nuove versioni.
 
-Per Pages, **Settings → Pages → Source** deve essere **GitHub Actions**. Il workflow ricava `VITE_BASE_PATH` dall’output `base_path` di `actions/configure-pages`: `/Ascensore-v2/` per l’indirizzo GitHub e `/` quando Pages usa un dominio personalizzato. Sviluppo e preview alla radice mantengono la base `/`. Il build produce anche ingressi HTML per `come-funziona/` e `gli-algoritmi/`, così i link diretti e il refresh funzionano sul server statico. Immagini, font, PDF e Web Worker rispettano lo stesso prefisso.
+Per Pages, **Settings → Pages → Source** deve essere **GitHub Actions**. Il workflow aggiunge `/elevator/` all’output `base_path` di `actions/configure-pages`: `/elevator/` sul dominio personalizzato, `/Ascensore-v2/elevator/` in assenza del dominio. Il build produce ingressi HTML per le pagine informative, così link diretti e refresh funzionano sul server statico. Immagini, font, PDF e Web Worker rispettano lo stesso prefisso. `npm run prepare:pages` colloca il build in `.cache/pages-site/elevator/` e prepara i reindirizzamenti alla radice; l’artefatto Pages è `.cache/pages-site`. Sviluppo e preview ordinari mantengono la base `/`.
 
 `npm run test:deployment` verifica il sito pubblico con Chromium: link diretti e refresh, PDF originale, risorse, due simulazioni senza reload, esempio interattivo, navigazione e download. È possibile passare un altro indirizzo dopo `--` per verificare prima un server statico locale. Richiede il browser Playwright già installato.
 
@@ -47,7 +47,7 @@ L’utente ha richiesto `davidelentini.it` il 9 ottobre 2026. Per collegarlo, so
 
 Impostare **Settings → Pages → Custom domain** su `davidelentini.it`, avviare **Pubblica Elevator** su `main` e abilitare **Enforce HTTPS** quando il certificato è disponibile. L’attivazione effettiva dipende dalla configurazione DNS e del dominio in Pages, non dal solo push di questo file.
 
-Verificare l’indirizzo definitivo con `npm run test:deployment -- https://davidelentini.it/`.
+Verificare l’indirizzo definitivo con `npm run test:deployment`. Per una verifica statica locale, eseguire `VITE_BASE_PATH=/elevator/ npm run build` e poi `VITE_BASE_PATH=/elevator/ npm run prepare:pages`; servire `.cache/pages-site` e passare l’URL locale completo di `/elevator/` al controllo. Il controllo include anche i reindirizzamenti dal dominio principale e dalle vecchie pagine.
 
 ## Uso
 

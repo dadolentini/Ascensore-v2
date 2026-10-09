@@ -25,12 +25,12 @@ jobs:
         uses: actions/configure-pages@v6
       - run: npm ci
       - run: npm test
-      - run: npm run build
+      - run: npm run build && npm run prepare:pages
         env:
-          VITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          VITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}/elevator/
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: dist
+          path: .cache/pages-site
 
   deploy:
     needs: build
