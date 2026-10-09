@@ -1,7 +1,7 @@
 import type { PolicyId, PolicyResult, RequestOutcome } from '../../model/contracts';
 import { mean } from '../../model/numerics';
 
-export const POLICY_NAMES:Record<PolicyId,string> = {fifo:'Reattiva',optimal:'Greedy sul costo J',adaptive:'Adattiva per ufficio'};
+export const POLICY_NAMES:Record<PolicyId,string> = {fifo:'Gestione di base',optimal:'Ottimizzazione delle chiamate',adaptive:'Sistema adattivo'};
 export const POLICY_COLORS:Record<PolicyId,string> = {fifo:'#25637D',optimal:'#73569C',adaptive:'#32685A'};
 export const seconds = (value:number|null) => value === null ? 'Non disponibile' : `${new Intl.NumberFormat('it-IT',{maximumFractionDigits:1}).format(value)} s`;
 export function aggregatePolicies(results:readonly PolicyResult[]) {

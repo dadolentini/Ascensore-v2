@@ -42,7 +42,7 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePop);
   }, []);
   useEffect(() => {
-    document.title = algorithms ? 'Gli algoritmi — Ascensori V2' : how ? 'Come funziona — Ascensori V2' : "Ascensori V2 — Il tempo, tra un piano e l'altro";
+    document.title = algorithms ? 'Gli algoritmi — Elevator' : how ? 'Come funziona — Elevator' : "Elevator — Il tempo, tra un piano e l'altro";
     if (window.location.hash) window.requestAnimationFrame(focusLocation);
   }, [algorithms, how]);
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function App() {
   return <NavigationContext.Provider value={navigate}>
     <a className="skip-link" href={secondary ? '#information-main' : '#landing-main'}>Vai al contenuto</a>
     <header className="site-header"><div className="header-inner container">
-      <RouteLink className="brand" href="/" aria-label="Ascensori V2 — Home"><span className="brand-mark" aria-hidden="true"><i/><i/><i/></span><span>Ascensori<span className="brand-version">V2</span></span></RouteLink>
+      <RouteLink className="brand" href="/" aria-label="Elevator — Home"><span className="brand-mark" aria-hidden="true"><i/><i/><i/></span><span>Elevator</span></RouteLink>
       <button ref={menuButton} className="menu-toggle" aria-expanded={menuOpen} aria-controls="main-navigation" onClick={()=>setMenuOpen(!menuOpen)}>{menuOpen ? 'Chiudi' : 'Menu'} <span aria-hidden="true">{menuOpen ? '−' : '+'}</span></button>
       <nav id="main-navigation" className={menuOpen ? 'main-nav is-open' : 'main-nav'} aria-label="Navigazione principale">
         <RouteLink href="/come-funziona" aria-current={how ? 'page' : undefined}>Come funziona</RouteLink><RouteLink href="/#simulatore">Simulatore</RouteLink><RouteLink href="/gli-algoritmi" aria-current={algorithms ? 'page' : undefined}>Gli algoritmi</RouteLink><RouteLink className="nav-cta" href="/#simulatore">Configura uno scenario <span aria-hidden="true">↗︎</span></RouteLink>
@@ -63,6 +63,6 @@ export default function App() {
     </div></header>
     <main id="landing-main" tabIndex={-1} hidden={secondary}><Landing/></main>
     {secondary && <main id="information-main" tabIndex={-1}><RouteBoundary key={algorithms ? 'algorithms' : 'how'}><Suspense fallback={<div className="route-message container" role="status"><p className="eyebrow">{algorithms ? 'Gli algoritmi' : 'Come funziona'}</p><h1>Caricamento dell'approfondimento…</h1></div>}>{algorithms ? <Algorithms onReady={focusLocation}/> : <HowItWorks onReady={focusLocation}/>}</Suspense></RouteBoundary></main>}
-    <footer className="site-footer"><div className="container"><div className="footer-top"><RouteLink className="brand" href="/">Ascensori <span className="brand-version">V2</span></RouteLink><p>La mobilità verticale,<br/>letta attraverso un modello.</p><div><RouteLink className="text-link" href="/gli-algoritmi#fonti">Modello, ipotesi e fonti <span aria-hidden="true">↗︎</span></RouteLink><a className="text-link footer-pdf" href="/model/rapporto_ascensori.pdf" target="_blank" rel="noreferrer">Apri il PDF matematico <span aria-hidden="true">↗︎</span><span className="sr-only"> (nuova scheda)</span></a></div></div><div className="footer-bottom"><p>Scenari sintetici. Uno strumento di studio, non un controllo hardware né una certificazione impiantistica.</p><p>Le immagini sono riferimenti architettonici illustrativi.</p></div></div></footer>
+    <footer className="site-footer"><div className="container"><div className="footer-top"><RouteLink className="brand" href="/">Elevator</RouteLink><p>La mobilità verticale,<br/>letta attraverso un modello.</p><div><RouteLink className="text-link" href="/gli-algoritmi#fonti">Modello, ipotesi e fonti <span aria-hidden="true">↗︎</span></RouteLink><a className="text-link footer-pdf" href="/model/rapporto_ascensori.pdf" target="_blank" rel="noreferrer">Apri il PDF matematico <span aria-hidden="true">↗︎</span><span className="sr-only"> (nuova scheda)</span></a></div></div><div className="footer-bottom"><p>Scenari sintetici. Uno strumento di studio, non un controllo hardware né una certificazione impiantistica.</p><p>Le immagini sono riferimenti architettonici illustrativi.</p></div></div></footer>
   </NavigationContext.Provider>;
 }

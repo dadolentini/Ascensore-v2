@@ -1,6 +1,7 @@
-import { useId } from 'react';
+import { useId, useMemo, useState, type PointerEvent } from 'react';
 import type { PolicyResult, RequestOutcome, ScenarioV2 } from '../../model/contracts';
 import { completedWaits, POLICY_COLORS, POLICY_NAMES, seconds, timelineRows, timeBuckets } from './data';
+import { cdfAt, nearestWaitIndex } from './cdf';
 
 export function TimelineChart({outcomes}:{outcomes:readonly RequestOutcome[]}) {
   const rows=timelineRows(outcomes),max=Math.max(1,...rows.map(r=>r.journeyS??0));
@@ -37,12 +38,22 @@ export function CabinLoadChart({result,scenario}:{result:PolicyResult;scenario:S
 }
 
 export function WaitCdf({results}:{results:readonly PolicyResult[]}) {
-  const id=useId(),policies=(['fifo','optimal','adaptive'] as const).filter(p=>results.some(r=>r.policy===p));
-  const series=policies.map(policy=>({policy,waits:completedWaits(results,policy)}));
+  const id=useId(),[selected,setSelected]=useState<number|null>(null);
+  const series=useMemo(()=>(['fifo','optimal','adaptive'] as const).filter(p=>results.some(r=>r.policy===p)).map(policy=>({policy,waits:completedWaits(results,policy)})),[results]);
+  const samples=useMemo(()=>[...new Set(series.flatMap(s=>s.waits))].sort((a,b)=>a-b),[series]);
   const max=Math.max(1,...series.map(s=>s.waits.at(-1)??0));
+  const active=selected===null||!samples.length?null:Math.min(selected,samples.length-1),threshold=active===null?null:samples[active];
+  const readings=threshold===null?[]:series.map(s=>({...s,...cdfAt(s.waits,threshold)}));
+  const percent=(value:number|null)=>value===null?'Non disponibile':`${new Intl.NumberFormat('it-IT',{maximumFractionDigits:1}).format(value)}%`;
+  function inspect(event:PointerEvent<SVGSVGElement>) {
+    const matrix=event.currentTarget.getScreenCTM();if(!matrix)return;
+    const point=new DOMPoint(event.clientX,event.clientY).matrixTransform(matrix.inverse());
+    if(point.y<40||point.y>190)return;
+    setSelected(nearestWaitIndex(samples,Math.max(0,Math.min(max,(point.x-50)*max/558))));
+  }
   return <figure className="data-figure"><figcaption><h3>Quanto si aspetta?</h3><p>La curva mostra la percentuale di viaggi completati con attesa entro un certo numero di secondi. Più a sinistra indica attese inferiori nel campione osservato.</p></figcaption>
     <div className="chart-legend">{series.map(s=><span key={s.policy}><i style={{background:POLICY_COLORS[s.policy]}}/> {POLICY_NAMES[s.policy]} · {s.waits.length} viaggi</span>)}</div>
-    {series.every(s=>s.waits.length===0)?<p>Nessun viaggio completato: la distribuzione delle attese non è disponibile.</p>:<div className="svg-chart-scroll" tabIndex={0} aria-label="Distribuzione cumulata delle attese"><svg viewBox="0 0 640 230" role="img" aria-labelledby={id}><title id={id}>Distribuzione cumulata dei tempi d’attesa dei viaggi completati: asse x secondi, asse y percentuale.</title>
+    {series.every(s=>s.waits.length===0)?<p>Nessun viaggio completato: la distribuzione delle attese non è disponibile.</p>:<><p className="chart-note" id={`${id}-help`}>Passa il cursore o tocca il grafico per leggere i dati del tempo osservato più vicino. Puoi usare anche il cursore sotto il grafico e le frecce della tastiera.</p><div className="svg-chart-scroll" tabIndex={0} aria-label="Distribuzione cumulata delle attese"><svg viewBox="0 0 640 230" role="img" aria-labelledby={id} onPointerMove={inspect} onPointerDown={inspect}><title id={id}>Distribuzione cumulata dei tempi d’attesa dei viaggi completati: asse x secondi, asse y percentuale.</title>
       {[0,25,50,75,100].map(p=><g key={p}><line x1="50" x2="608" y1={190-1.5*p} y2={190-1.5*p} className="gridline"/><text x="42" y={194-1.5*p} textAnchor="end">{p}%</text></g>)}
       {[0,.25,.5,.75,1].map(p=><text key={p} x={50+558*p} y="210" textAnchor={p===0?'start':p===1?'end':'middle'}>{Math.round(max*p)}</text>)}
       <text x="50" y="20">Viaggi completati (%)</text><text x="608" y="228" textAnchor="end">Attesa (s)</text>
@@ -50,8 +61,11 @@ export function WaitCdf({results}:{results:readonly PolicyResult[]}) {
         const step=Math.max(1,Math.ceil(s.waits.length/250));const points=s.waits.flatMap((w,j)=>j%step===0||j===s.waits.length-1?[[w,100*(j+1)/s.waits.length]]:[]);
         return <path key={s.policy} d={['M50,190',...points.map(([w,p])=>`L${50+558*w/max},${190-1.5*p}`)].join(' ')} stroke={POLICY_COLORS[s.policy]} strokeDasharray={i===1?'7 3':i===2?'2 4':undefined} fill="none" strokeWidth="2.5"/>;
       })}
-    </svg></div>}
-    <p className="chart-note">Campioni delle repliche raggruppati. La visualizzazione riduce i punti; calcoli ed export conservano tutti i dati. Una curva favorevole non compensa automaticamente richieste non completate.</p>
+      {threshold!==null&&<g aria-hidden="true"><line x1={50+558*threshold/max} x2={50+558*threshold/max} y1="40" y2="190" className="cdf-crosshair"/>{readings.filter(r=>r.percent!==null).map(r=><circle key={r.policy} cx={50+558*threshold/max} cy={190-1.5*r.percent!} r="4.5" fill={POLICY_COLORS[r.policy]} stroke="var(--surface)" strokeWidth="2"/>)}</g>}
+    </svg></div><div className="cdf-inspector"><label htmlFor={`${id}-cursor`}>Attesa da esplorare</label><input id={`${id}-cursor`} type="range" min="0" max={samples.length-1} step="1" value={active??0} onFocus={()=>setSelected(active??0)} onChange={e=>setSelected(Number(e.target.value))} aria-describedby={`${id}-help`} aria-valuetext={threshold===null?'Seleziona un tempo osservato':`${seconds(threshold)}; ${readings.map(r=>`${POLICY_NAMES[r.policy]}: ${percent(r.percent)}`).join('; ')}`}/>
+      <div className="cdf-point-readout" data-wait-seconds={threshold??undefined}>{threshold===null?<p>Seleziona un punto per confrontare le tre strategie.</p>:<><strong>Attesa entro {seconds(threshold)}</strong><ul>{readings.map(r=><li key={r.policy}><span><i style={{background:POLICY_COLORS[r.policy]}}/>{POLICY_NAMES[r.policy]}</span><span><strong>{percent(r.percent)}</strong> · {r.count} / {r.total} viaggi completati</span></li>)}</ul></>}</div>
+    </div></>}
+    <p className="chart-note">Campioni delle repliche raggruppati. La visualizzazione riduce i punti; la lettura interattiva, i calcoli e l’export usano tutti i dati. Una curva favorevole non compensa automaticamente richieste non completate.</p>
   </figure>;
 }
 
