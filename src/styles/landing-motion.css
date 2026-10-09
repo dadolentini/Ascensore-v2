@@ -1,0 +1,48 @@
+/* Elements are fully visible until the hook has installed its observer. */
+#landing-main[data-landing-motion='on'] [data-landing-reveal] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 560ms cubic-bezier(.22, .61, .36, 1), transform 560ms cubic-bezier(.22, .61, .36, 1);
+  transition-delay: var(--landing-reveal-delay, 0ms);
+}
+
+#landing-main[data-landing-motion='on'] [data-landing-revealed='false'] {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+}
+
+#landing-main .hero-line { display: inline-block; max-width: 100%; }
+
+#landing-main [data-landing-parallax] { overflow: hidden; }
+#landing-main [data-landing-parallax] img { transition: transform 200ms ease-out; }
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  #landing-main [data-landing-parallax-active='true'] img {
+    transform: translate3d(var(--landing-pointer-x, 0px), var(--landing-pointer-y, 0px), 0) scale(1.035);
+    will-change: transform;
+  }
+}
+
+#landing-main[data-landing-motion='on'] [data-landing-reveal-instant='true'],
+#landing-main[data-landing-motion='on'] [data-landing-reveal]:focus-within {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+@media (max-width: 800px) {
+  #landing-main[data-landing-motion='on'] [data-landing-reveal] {
+    transition-duration: 440ms;
+    transition-delay: 0ms;
+  }
+  #landing-main[data-landing-motion='on'] [data-landing-revealed='false'] { transform: translate3d(0, 12px, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #landing-main[data-landing-motion='on'] [data-landing-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  #landing-main [data-landing-parallax] img { transform: none; transition: none; }
+}

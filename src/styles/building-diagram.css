@@ -1,0 +1,16 @@
+.diagram-motion-toggle{display:inline-flex;align-items:center;gap:10px;min-height:44px;margin:14px 7% 0;padding:8px 12px;border:1px solid var(--ocean);background:transparent;color:var(--ink);font-size:12px}
+.diagram-motion-toggle:hover{background:var(--ocean-soft)}
+.diagram-motion-toggle>span{font-size:16px}
+@media(prefers-reduced-motion:no-preference){
+  .diagram-motion .diagram-car{animation-duration:20s;animation-timing-function:cubic-bezier(.45,0,.25,1);animation-iteration-count:infinite;animation-play-state:paused}
+  .diagram-motion[data-motion='running'] .diagram-car{animation-play-state:running}
+  .diagram-motion .diagram-car-0{animation-name:diagram-cabin-a;animation-delay:-2s}
+  .diagram-motion .diagram-car-1{animation-name:diagram-cabin-b;animation-duration:22s;animation-delay:-7s}
+  .diagram-motion .diagram-car-2{animation-name:diagram-cabin-c;animation-duration:24s;animation-delay:-3s}
+  .diagram-motion .diagram-car-3{animation-name:diagram-cabin-d;animation-duration:21s;animation-delay:-5s}
+}
+@keyframes diagram-cabin-a{0%,8%,100%{transform:translateY(0)}30%,38%{transform:translateY(-162px)}58%,66%{transform:translateY(-243px)}86%,92%{transform:translateY(81px)}}
+@keyframes diagram-cabin-b{0%,8%,100%{transform:translateY(0)}30%,38%{transform:translateY(243px)}58%,66%{transform:translateY(81px)}86%,92%{transform:translateY(-81px)}}
+@keyframes diagram-cabin-c{0%,8%,100%{transform:translateY(0)}30%,38%{transform:translateY(-162px)}58%,66%{transform:translateY(162px)}86%,92%{transform:translateY(-81px)}}
+@keyframes diagram-cabin-d{0%,8%,100%{transform:translateY(0)}30%,38%{transform:translateY(-243px)}58%,66%{transform:translateY(-324px)}86%,92%{transform:translateY(-81px)}}
+@media(prefers-reduced-motion:reduce){.diagram-motion .diagram-car{animation:none;transform:none}}

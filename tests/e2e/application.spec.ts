@@ -31,6 +31,57 @@ test('landing chiara, pagine progressive, PDF autentico e nessun errore JS',asyn
   await expect(page.getByRole('heading',{level:1})).toContainText('Le regole');await expect(page.locator('.katex-mathml').first()).toBeAttached();
   expect(errors).toEqual([]);
 });
+test('landing: scroll e puntatore muovono i contenuti, reduced motion li rende subito leggibili',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.emulateMedia({reducedMotion:'no-preference'});await page.goto('/');
+  const main=page.locator('#landing-main'),heading=page.locator('#problem-title');
+  await expect(main).toHaveAttribute('data-landing-motion','on');
+  await expect(page.locator('.hero-line')).toHaveCount(3);
+  await expect(heading).toHaveAttribute('data-landing-revealed','false');
+  const picture=page.locator('.tower-frame'),image=picture.locator('img'),box=(await picture.boundingBox())!;
+  await page.mouse.move(box.x+box.width*.85,box.y+box.height*.5);
+  await expect.poll(()=>image.evaluate(el=>{const transform=getComputedStyle(el).transform;return transform==='none'?0:new DOMMatrixReadOnly(transform).m41;})).toBeGreaterThan(1);
+  await page.mouse.move(10,10);await expect(image).toHaveCSS('transform','none');
+  await heading.scrollIntoViewIfNeeded();await expect(heading).toHaveAttribute('data-landing-revealed','true');
+  await expect(heading).toHaveCSS('opacity','1');
+  await page.locator('.hero').scrollIntoViewIfNeeded();
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect(main).not.toHaveAttribute('data-landing-motion','on');
+  await expect(page.locator('[data-landing-revealed="false"]')).toHaveCount(0);
+  await expect(heading).toHaveCSS('opacity','1');
+  const still=(await picture.boundingBox())!;await page.mouse.move(still.x+still.width*.85,still.y+still.height*.5);
+  await expect(image).toHaveCSS('transform','none');
+  expect(errors).toEqual([]);
+});
+test('il testo della landing resta leggibile anche senza observer',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.addInitScript(()=>Object.defineProperty(window,'IntersectionObserver',{configurable:true,value:undefined}));
+  await page.goto('/');await expect(page.locator('#hero-title')).toBeVisible();
+  await expect(page.locator('#landing-main')).not.toHaveAttribute('data-landing-motion','on');
+  expect(await page.locator('[data-landing-reveal]').evaluateAll(elements=>elements.every(el=>getComputedStyle(el).opacity==='1'))).toBeTruthy();
+  await page.locator('#problem-title').scrollIntoViewIfNeeded();await expect(page.locator('#problem-title')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+test('schema dinamico: cabine in movimento, pausa, fuori schermo e reduced motion',async({page})=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});await page.goto('/');
+  const figure=page.locator('.building-figure'),car=figure.locator('.diagram-car').first();
+  await figure.scrollIntoViewIfNeeded();await expect(figure).toHaveAttribute('data-motion','running');
+  const initial=(await car.boundingBox())!.y;
+  await expect.poll(async()=>Math.abs((await car.boundingBox())!.y-initial)).toBeGreaterThan(1);
+  await page.getByRole('button',{name:'Metti in pausa il disegno',exact:true}).click();
+  await expect(figure).toHaveAttribute('data-motion','paused');
+  const paused=(await car.boundingBox())!.y;
+  await page.waitForTimeout(250);expect(Math.abs((await car.boundingBox())!.y-paused)).toBeLessThan(.1);
+  await page.getByRole('button',{name:'Riprendi il disegno',exact:true}).click();
+  await expect(figure).toHaveAttribute('data-motion','running');
+  await page.locator('.hero').scrollIntoViewIfNeeded();await expect(figure).toHaveAttribute('data-motion','paused');
+  await page.setViewportSize({width:320,height:800});await figure.scrollIntoViewIfNeeded();
+  await expect(figure).toHaveAttribute('data-motion','running');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
+  await page.emulateMedia({reducedMotion:'reduce'});await expect(figure).toHaveAttribute('data-motion','reduced');
+  expect(await car.evaluate(el=>el.getAnimations().filter(a=>a.playState==='running').length)).toBe(0);
+  await expect(figure.getByRole('button')).toHaveCount(0);
+});
 test('partecipazione in percentuale, conversione del dato e limiti senza cambiare il modello',async({page})=>{
   await configureSmall(page);
   await page.getByText('Personalizza uffici e pause',{exact:true}).click();
@@ -123,6 +174,7 @@ test('mobile 320px, tastiera e reduced motion mantengono contenuti e azioni',asy
   await expect(page.getByRole('heading',{level:1})).toContainText('Le regole');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
 });
 test('accessibilità automatica delle tre pagine e dei grafici calcolati',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});
   for(const path of ['/','/gli-algoritmi','/come-funziona','/#simulatore']) {
     await page.goto(path);await expect(page.getByRole('heading',{level:1})).toBeVisible();
     if(path==='/come-funziona'){await page.getByRole('button',{name:'Osserva l’automazione',exact:false}).click();await expect(page.getByText('3 di 3 persone arrivate a destinazione.',{exact:true})).toBeVisible();}
