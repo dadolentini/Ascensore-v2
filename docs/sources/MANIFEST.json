@@ -1,0 +1,140 @@
+[
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/rapporto_ascensori.pdf",
+    "sha256": "591f8d0a5de520f02c7fa5aa65689b9cb3b775a117c0f9ea988bc839ff9f5365",
+    "bytes": 485960
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/rapporto_ascensori.tex",
+    "sha256": "953b06f197f0711c945207268457b4655a4785511e547b0f3ea7869293dc1a09",
+    "bytes": 32920
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/parametri_ascensori.json",
+    "sha256": "087da3fe11e69bd76be746b614299212754f7ff1bf4ce5e7eb31c1916618759d",
+    "bytes": 2612
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/simulatore_ascensori.py",
+    "sha256": "8b64d80804c086468adfbbd87f9d8c28bd0d7814bb5c31445a25e8338a279ad6",
+    "bytes": 27455
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/uffici_adattivi.py",
+    "sha256": "86ac2adde50a1646a5a87b5da55e593cd0e561ffa9ac0c707014875b341cbe86",
+    "bytes": 15459
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/test_uffici.py",
+    "sha256": "ce2a5b8e48b5f28112ad4604cbe6bae8056b2ba4873e3767fd93d250c9ae0b07",
+    "bytes": 2238
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/crea_rapporto.py",
+    "sha256": "cc36ea562e83b01938642587cf25013ef61482343f7ef4e78a1eed8bfb3762fe",
+    "bytes": 4154
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/metriche_generate.tex",
+    "sha256": "4361be6483aea60081884025398feb9a7bcd35ebdb55a4b9533f94b51b5a85f9",
+    "bytes": 1607
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/README.txt",
+    "sha256": "1863dc3b78673fd84ee3360ef14fe085dee9a46bd4020fcd457fe237922b7fc3",
+    "bytes": 2739
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/risultati/grafico_01_best_fit_flussi.pdf",
+    "sha256": "fb6352de8f16f4711e9c1f3423fb052ee78dfc4ef59e6c0b3d56bd7844346bc6",
+    "bytes": 20387
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/risultati/grafico_02_attese_orarie.pdf",
+    "sha256": "102bac2f9a64c3add95e7a153a7479ca6e721a8e66300e869ef97036f5e8cabd",
+    "bytes": 15993
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/risultati/grafico_07_raggruppamento_uffici.pdf",
+    "sha256": "0701ef33ec713cab0d8b65d807123433e0973aa32c96dae9ab1169ae0dd0243d",
+    "bytes": 21293
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/risultati/grafico_04_repliche.pdf",
+    "sha256": "91e0afda65fdf5884dc54db18a2de69ef5a267586a55912bde5a9f8393d2246e",
+    "bytes": 16147
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/risultati/grafico_03_cdf_attese.pdf",
+    "sha256": "142d7567933284542a20988cec69ae7db2411e62b170452b801d1d6c7a2b1a4b",
+    "bytes": 20752
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/risultati/grafico_05_capacita_kg.pdf",
+    "sha256": "dab602c530533873db8cf026d5512463c1e3c08861b5b8b7327e34f84e3c34ee",
+    "bytes": 15498
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/risultati/grafico_06_fit_abitudini_ufficio.pdf",
+    "sha256": "0ebe9f521cce086a799d6854a42d18249e65ba57964615f984e1425cad7b77d1",
+    "bytes": 17102
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/risultati/risultati_sintesi.json",
+    "sha256": "ff5cd3047b3ad50714eb6af6c68d2987b09c396b066dd0da86dc72d0ddcef4a0",
+    "bytes": 8781
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/risultati/modello_uffici_appreso.json",
+    "sha256": "7105df3f6552310cea3c84f1eee6cb3ed3b994b9e89ab2f5c301fc64fde7e7fa",
+    "bytes": 14785
+  },
+  {
+    "archive": "Modello_Matematico_Parametrico_Ascensori_Uffici.zip",
+    "member": "Modello_Ascensori_V2/risultati/metriche_repliche.csv",
+    "sha256": "b477a228a87b5a60746094e3427dcf50ce8722e11a002ce14a248e0b63ea1ea4",
+    "bytes": 4312
+  },
+  {
+    "archive": "zip.zip",
+    "member": "zip/Immagine ChatGPT 8 ott 2026, 17_38_51-3.png",
+    "sha256": "ae77817db6887adddeb2a4e3e5c176b5606d110365b820d9290eced8252b4869",
+    "bytes": 2034725
+  },
+  {
+    "archive": "zip.zip",
+    "member": "zip/Immagine ChatGPT 8 ott 2026, 17_44_48-4.png",
+    "sha256": "0b007e4cb374cdf62a9200c57b0e9e2ca129ce5951319561ccea4c314aff9507",
+    "bytes": 2095941
+  },
+  {
+    "archive": "zip.zip",
+    "member": "zip/Immagine ChatGPT 8 ott 2026, 17_44_50-5.png",
+    "sha256": "341de8bd3ab99a98a4c5fe28f73c8d376ce9517646ef0b1f63dca0fbb3f2c344",
+    "bytes": 1905555
+  },
+  {
+    "archive": "zip.zip",
+    "member": "zip/Immagine ChatGPT 8 ott 2026, 17_44_44-1.png",
+    "sha256": "afe57dbe30b624cc1e57ae1a525d8c1beb0cc3b506429f54664888a575a26bb7",
+    "bytes": 2528934
+  }
+]

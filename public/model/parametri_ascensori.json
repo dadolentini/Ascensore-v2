@@ -1,0 +1,117 @@
+{
+  "building": {
+    "upper_floors": 15,
+    "number_of_elevators": 4,
+    "employees_per_floor": 35,
+    "floor_height_m": 3.3,
+    "lobby_floor": 0
+  },
+  "elevators": {
+    "rated_load_kg": 1000,
+    "max_people": 13,
+    "speed_m_s": 2.5,
+    "acceleration_m_s2": 1.0,
+    "door_base_s": 5.5,
+    "passenger_transfer_s": 0.8,
+    "weight_mean_kg": 76,
+    "weight_sd_kg": 14,
+    "weight_min_kg": 48,
+    "weight_max_kg": 115,
+    "robust_reserved_kg_per_future_passenger": 87,
+    "optimized_max_planned_load_fraction": 0.96
+  },
+  "traffic": {
+    "office_start_hour": 8,
+    "office_end_hour": 19,
+    "arrival_mean_hour": 7.88,
+    "arrival_sd_minutes": 16,
+    "departure_mean_hour": 19.06,
+    "departure_sd_minutes": 17,
+    "lunch_duration_minutes": 60,
+    "lunch_participation": 0.72,
+    "lunch_start_hours": [
+      12,
+      13,
+      14
+    ],
+    "lunch_start_probabilities": [
+      0.35,
+      0.43,
+      0.22
+    ],
+    "lunch_sd_minutes": 9,
+    "internal_trips_probability_per_worker": 0.09,
+    "simulation_start_hour": 7.0,
+    "simulation_end_hour": 21.0
+  },
+  "experiment": {
+    "seeds": [
+      101,
+      202,
+      303,
+      404,
+      505,
+      606,
+      707,
+      808
+    ],
+    "fit_training_days": 6,
+    "arrival_histogram_minutes": 10,
+    "chart_bin_minutes": 30,
+    "fairness_threshold_seconds": 120,
+    "objective_ride_time_factor": 0.33,
+    "objective_late_wait_factor": 0.035,
+    "relocation_forecast_horizon_minutes": 12,
+    "relocation_idle_delay_seconds": 35
+  },
+  "offices": {
+    "number_of_offices": 30,
+    "total_employees": 525,
+    "definitions": [],
+    "focus_office": {
+      "id": "U12-FOCUS",
+      "floor": 12,
+      "employees": 65,
+      "lunch_start_hour": 13.0
+    },
+    "default_lunch_start_hours": [
+      12.0,
+      13.0,
+      14.0
+    ],
+    "habit_seed": 917,
+    "true_habit_sd_minutes": 9.0,
+    "daily_schedule_jitter_minutes": 2.5,
+    "shrinkage_prior_events": 22,
+    "participation_prior_worker_days": 12,
+    "training_day_seeds": [
+      1101,
+      1102,
+      1103,
+      1104,
+      1105,
+      1106,
+      1107,
+      1108,
+      1109,
+      1110,
+      1111,
+      1112
+    ],
+    "validation_day_seeds": [
+      2201,
+      2202,
+      2203,
+      2204
+    ],
+    "forecast_horizon_minutes": 12,
+    "preposition_lead_minutes": 3,
+    "reserve_idle_cars": 1,
+    "effective_capacity_fraction_per_horizon": 0.82,
+    "min_office_predicted_calls": 3.0,
+    "movement_penalty_per_second": 0.1,
+    "reserve_coverage_penalty": 0.1,
+    "max_grouped_cars_per_floor": 3,
+    "recompute_parking_delay_seconds": 35
+  }
+}

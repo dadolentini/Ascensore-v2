@@ -1,0 +1,385 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[italian]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage[margin=20.5mm,headheight=14pt,headsep=10pt,footskip=13mm]{geometry}
+\usepackage{booktabs,array,longtable,multirow,tabularx}
+\usepackage{graphicx,float,placeins}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\usepackage{xcolor}
+\definecolor{midgrey}{gray}{0.43}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\setlist[itemize]{itemsep=2pt,topsep=4pt}
+\setlist[enumerate]{itemsep=3pt,topsep=4pt}
+\renewcommand{\arraystretch}{1.19}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize SISTEMA DI CONTROLLO ASCENSORI / ANALISI TECNICA}
+\fancyhead[R]{\footnotesize 4 CABINE \enspace | \enspace PIANI 0--15}
+\fancyfoot[L]{\footnotesize Scenario parametrico --- non certificazione impiantistica}
+\fancyfoot[R]{\footnotesize\thepage}
+\renewcommand{\headrulewidth}{0.35pt}
+\renewcommand{\footrulewidth}{0pt}
+\newcommand{\Fig}[2]{\begin{figure}[H]\centering\includegraphics[width=0.99\linewidth]{risultati/#1}\caption{#2}\end{figure}}
+\newcommand{\st}{\,\mathrm{s}}
+\newcommand{\kg}{\,\mathrm{kg}}
+\newcommand{\minu}{\,\mathrm{min}}
+\newcommand{\pos}[1]{\left[#1\right]_+}
+\newcommand{\secname}[1]{\vspace{1mm}\section{#1}}
+\input{metriche_generate.tex}
+\begin{document}
+\thispagestyle{empty}
+\vspace*{10mm}
+{\fontsize{13}{15}\selectfont \textbf{RICERCA OPERATIVA / MOBILIT\`A VERTICALE}}\\[9mm]
+\rule{\linewidth}{1.3pt}\\[6mm]
+{\fontsize{30}{35}\selectfont\bfseries Ottimizzazione matematica\\di quattro ascensori}\\[5mm]
+{\Large Palazzo di uffici: 15 piani sopra il piano terra}\\[9mm]
+{\normalsize Modello a eventi discreti, previsione per singolo ufficio, raggruppamento predittivo e confronto Monte Carlo}\\[11mm]
+\rule{\linewidth}{0.5pt}\\[5mm]
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X@{}}
+Oggetto & Regole di assegnazione delle chiamate per quattro cabine, livelli 0--15 \\
+Orari noti & Attivit\`a degli uffici 08:00--19:00; pause di 60 minuti con inizio variabile \\
+Risultati & \Nreq\ richieste/giorno simulate in media; \Nrep\ repliche riproducibili \\
+Metodo & Eventi discreti, apprendimento da storico per \Noffices\ uffici, allocazione proattiva e fit dei flussi \\
+Data & 8 ottobre 2026 \\
+\end{tabularx}
+\vspace{12mm}
+\begin{tabularx}{\linewidth}{@{}X X@{}}
+\toprule
+\textbf{Controllo reattivo (benchmark)} & \textbf{Controllo ottimizzato}\\
+\midrule
+{\fontsize{28}{30}\selectfont\bfseries\Wbase\,s} & {\fontsize{28}{30}\selectfont\bfseries\Wopt\,s}\\
+Attesa media simulata & Attesa media simulata\\[2mm]
+95\textsuperscript{o} percentile: \Pbase\,s & 95\textsuperscript{o} percentile: \Popt\,s\\
+\bottomrule
+\end{tabularx}
+\vfill
+{\small\bfseries Avvertenza metodologica.} \small Le ore e la geometria dei piani sono vincoli del caso; popolazione, portata, tempi di movimentazione e profili statistici sono \emph{assunzioni esplicite}, non rilievi effettuati nell'edificio. Il confronto quantifica soltanto il comportamento dei due algoritmi implementati, a parit\`a di richieste sintetiche. \textbf{Non} stima il risparmio reale garantito n\'e sostituisce progetto, verifiche di sicurezza o collaudo.
+\newpage
+\tableofcontents
+\newpage
+\secname{Definizione del problema e dati}
+\subsection{Cosa \`e noto e cosa viene ipotizzato}
+La configurazione spaziale \`e \(F=\{0,1,\dots,15\}\), con \(0\) = piano terra, e \(E=\{1,2,3,4\}\) = cabine. La finestra di lavoro osservata per ipotesi \`e 08:00--19:00 (11 ore), con pausa di 60 minuti \emph{non sincronizzata}. L'orizzonte della simulazione include code anticipate e posticipate: 07:00--21:00.
+
+\begin{table}[H]\centering\small
+\begin{tabularx}{\linewidth}{@{}p{43mm}p{45mm}X@{}}
+\toprule
+\textbf{Grandezza} & \textbf{Valore esempio} & \textbf{Ruolo / modificabilit\`a}\\
+\midrule
+Numero di piani & 15 + terra & Vincolo fornito, modificabile nel codice\\
+Numero di cabine & 4 & Vincolo fornito, modificabile nel codice\\
+Orario uffici & 08:00--19:00 & Vincolo fornito; orari di \emph{uso} distribuiti statisticamente\\
+Durata pranzo & 60 min & Vincolo fornito\\
+Inizi del pranzo & 12:00 / 13:00 / 14:00 & Fasce fornite; assegnabili liberamente ai singoli uffici\\
+Partecipazione al pranzo & 72\% & Assunta; 28\% non genera viaggio di pranzo\\
+Uffici e addetti & \Noffices\ uffici; \Nstaff\ addetti & Assunti; numeri, piani, orari e organici modificabili indipendentemente\\
+Carico cabina & \Qcap\,kg / \Nplaces\ persone & Assunti; entrambi vincoli di ammissibilit\`a\\
+Velocit\`a, accelerazione & 2,5 m/s; 1 m/s\textsuperscript{2} & Assunte; profilo trapezoidale\\
+Altezza di interpiano & 3,3 m & Assunta uniforme\\
+Tempo porta base / trasferimento & 5,5 s / 0,8 s a persona & Assunti; stima semplificata\\
+Peso utente & Normale troncata: 76 \(\pm\) 14 kg & Assunto; intervallo 48--115 kg\\
+\bottomrule
+\end{tabularx}
+\caption{Registro delle ipotesi. I valori tecnici devono essere sostituiti con le specifiche delle cabine e con misure in sito.}
+\end{table}
+\textbf{Punto decisivo:} nel modello entrambe le politiche ricevono la \emph{destinazione dichiarata alla chiamata} (terminali di selezione destinazione, DCS). \`E un prerequisito tecnologico, \textbf{non} un attributo fornito del palazzo. Con pulsanti tradizionali su/gi\`u, usare \(\mathbb E[d\mid f,\mathrm{direzione},t]\) finch\'e il passeggero non entra in cabina; i risultati non sono direttamente trasferibili senza una nuova simulazione.
+
+\secname{Variabili e domanda dinamica}
+Ogni richiesta \(r\) ha tempi \(a_r\) (comparsa), \(p_r\) (ingresso), \(d_r\) (uscita), origine \(o_r\), destinazione \(z_r\), massa effettiva \(w_r\). Si definiscono attesa \(W_r=p_r-a_r\), viaggio \(R_r=d_r-p_r\), tempo totale \(T_r=W_r+R_r\).
+
+\begin{equation}
+\lambda_{od}(t)=\lambda^{\rm apertura}_{od}(t)+\lambda^{\rm pranzo}_{od}(t)
+ +\lambda^{\rm chiusura}_{od}(t)+\lambda^{\rm altro}_{od}(t),\quad o\ne d.
+\end{equation}
+In un modello aggregato per piano, con pesi \(\pi=(0{,}35,0{,}43,0{,}22)\) solo illustrativi e \(h=(12,13,14)\), una componente \emph{semplificata} degli spostamenti di ritorno \`e:
+\begin{equation}
+\lambda_{0f}^{\rm ritorno}(t)=N_f p_{\ell,f}\sum_{j=1}^{3}\pi_{f,j}\,
+\varphi_{\sigma_{\ell,f}}\bigl(t-h_j-1\bigr),\quad
+\varphi_\sigma(u)=\frac{1}{\sqrt{2\pi}\,\sigma}e^{-u^2/(2\sigma^2)}.
+\end{equation}
+\small Se \(t\) \`e espresso in ore, \(\lambda\) qui \`e in passeggeri/ora; dividere per 60 per ottenere passeggeri/minuto. Arrivi mattutini e partenze serali sono anch'essi gaussiani nel simulatore; \(\lambda^{\rm altro}\) permette traffico interno e fenomeni non modellati. Le ampiezze devono essere calibrate localmente.
+\normalsize
+\newpage
+\secname{Best fit dei flussi: procedura riutilizzabile}
+A partire da conteggi in intervalli \(\Delta=10\minu\), si stima separatamente il tasso in salita e in discesa come miscela di basi gaussiane a \emph{centri prefissati}:
+\begin{align}
+\widehat\lambda_s(t)&=\beta_{s,0}+\sum_{j=1}^{4}\beta_{s,j}
+\exp\!\left(-\frac{(t-\mu_{s,j})^2}{2\sigma_{s,j}^2}\right),\quad \beta_{s,j}\geq0; \\[2mm]
+\widehat{\boldsymbol\beta}_s&=\underset{\boldsymbol\beta_s\geq0}{\arg\min}\ \|X_s\boldsymbol\beta_s-\bar{\boldsymbol y}_{s,\rm train}\|_2^2.
+\end{align}
+Questa \`e una regressione ai minimi quadrati \emph{non negativi} (NNLS). Sei repliche indipendenti stimano i coefficienti, due repliche non usate nel fit li verificano. I centri sono in salita \(\mu_\uparrow=(7{,}88;13;14;15)\), in discesa \(\mu_\downarrow=(12;13;14;19{,}06)\). \(\sigma\) sono gli scarti dell'esperimento: 16, 9 e 17 minuti a seconda della componente.
+\Fig{grafico_01_best_fit_flussi.pdf}{Curve NNLS apprese da 6 giornate sintetiche contro media di 2 giornate sintetiche escluse dal fit. Le serie non provengono da sensori dell'edificio.}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}\toprule
+Verso & \(R^2\) fuori campione & Errore assoluto medio [pax/min]\\\midrule
+Salita & \FitUpR & \FitUpMAE\\
+Discesa & \FitDownR & \FitDownMAE\\\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Interpretazione rigorosa:} un \(R^2\) elevato non \`e validazione sul campo, perch\'e i dati sono generati con la stessa famiglia di distribuzioni usata per il fit. Per la taratura reale, acquisire almeno 2--4 settimane di timestamp delle chiamate, OD, tempi e occupazione (nel rispetto della privacy); stimare i parametri su giorni di training e valutarli su altri giorni.
+\newpage
+\secname{Fisica della cabina e saturazione}
+Per distanza verticale \(\delta=h|f-g|\), velocit\`a massima \(v\) e accelerazione di modulo \(a\), una legge simmetrica ideale di percorrenza \`e
+\begin{equation}
+T_{\rm moto}(f,g)=
+\begin{cases}
+2\sqrt{\delta/a},&\delta\le v^2/a,\\
+\delta/v+v/a,&\delta>v^2/a.
+\end{cases}
+\quad
+T_{\rm fermata}=t_{\rm porta}+t_{\rm trasf}(n_{\rm saliti}+n_{\rm scesi}).
+\end{equation}
+Dinamiche reali (jerk, livellamento, ritardi sensori, porte accessibili) vanno calibrate a posteriori.
+
+Siano \(L_e(t)\) il peso \emph{misurato} e \(n_e(t)\) gli occupanti. La cabina \(e\) \`e ammissibile a un nuovo imbarco \(r\) soltanto se
+\begin{equation}
+L_e(t)+w_r\le Q_e,\qquad n_e(t)+1\le C_e.
+\end{equation}
+Il peso del richiedente \emph{non} \`e noto prima dell'ingresso. Per la pianificazione si riserva invece \(\widetilde w=\Wreserve\kg\) per chiamata e si impone, lungo \emph{ogni} fermata futura della sequenza,
+\begin{equation}
+\widehat L_e^{(k)}=L_e(t)+\sum_{r\in\mathcal P_e^{(k)}}\widetilde w
+-\sum_{r\in\mathcal D_e^{(k)}}w_r^*\ \le\rho Q_e,\qquad
+\widehat n_e^{(k)}\le C_e,\quad \rho=\RhoCap.
+\end{equation}
+Nella somma delle uscite si impiega il peso effettivo dei gi\`a imbarcati e il peso riservato degli altri. Il margine \(1-\rho\) \`e una protezione prudenziale, \textbf{non} una deroga alla portata legale.
+
+\subsection*{Regola ``cabina piena'' e chiamata alternativa}
+Se al momento di imbarcare \(L_e+w_r>Q_e\) oppure \(n_e+1>C_e\), il passeggero non entra, la chiamata non viene cancellata e viene riassegnata alla prima cabina \emph{ammissibile per ETA} (non necessariamente la pi\`u vicina in metri). Se il piano \`e servito anche per sbarcare passeggeri, \textbf{lo sbarco resta obbligatorio}: non si salta quella fermata. Se la sola operazione era il prelievo impossibile, non si apre per quella chiamata.
+
+\textbf{Esempio puramente illustrativo:} cabina A a 920 kg, portata 1\,000 kg, richiedente 90 kg: \(920+90>1\,000\), prelievo non consentito. Cabina B con ETA 21 s e carico compatibile ha priorit\`a, anche se A sarebbe raggiungibile in 8 s.
+
+\secname{Indicatori di dimensionamento}
+Per una prima \emph{verifica statica}, indicando con \(\mathrm{RTT}\) il tempo medio di andata e ritorno e con \(P\) il carico medio di progetto di ciascuna cabina:
+\begin{equation}
+\mathrm{HC}_{5\min}=\frac{300\,mP}{\mathrm{RTT}},\qquad
+\mathrm{INT}=\frac{\mathrm{RTT}}{m},\qquad m=4.
+\end{equation}
+La verifica reale richiede intensit\`a e matrice origine/destinazione variabili nel tempo, perci\`o la formula di screening non sostituisce la simulazione.
+\newpage
+\secname{Problema di instradamento delle quattro cabine}
+Ogni cabina \(e\) ha una sequenza ordinata di fermate \(S_e=(s_{e,1},\ldots,s_{e,k})\). La nuova domanda \(r\) aggiunge un prelievo \(P_r\) e uno sbarco \(D_r\), con posizione \(i<j\). Il primo obiettivo \`e la valutazione del \emph{costo marginale} di tutti gli inserimenti fattibili:
+\begin{equation}
+(e^*,i^*,j^*)=\underset{\substack{e\in E,\;i<j\\S_e\oplus(P_r,D_r)\in\mathcal F}}{\arg\min}
+\Big[J_t\big(S_e\oplus_i P_r\oplus_j D_r\big)-J_t(S_e)\Big].
+\label{eq:dispatch}
+\end{equation}
+Il funzionale computato nel prototipo \`e
+\begin{equation}
+J_t(S)=\sum_{r\in\mathcal W(S)}\left[\widehat W_r^{\rm residuo}+
+\underbrace{\frac{\zeta}{100}\pos{\widehat W_r^{\rm totale}-w_0}^{2}}_{\text{penale anti-abbandono}}\right]
++\alpha\sum_{r\in\mathcal A(S)}\widehat R_r^{\rm residuo}.
+\label{eq:objective}
+\end{equation}
+Nel prototipo: \(\alpha=0{,}33\), \(\zeta=0{,}035\), \(w_0=120\st\). \(\mathcal W\): richieste in attesa; \(\mathcal A\): richieste pendenti; gli ETA sono determinati dalla traiettoria e dai tempi di porta. La fattibilit\`a \(\mathcal F\) include massa, posti, precedenza pickup--dropoff e impossibilit\`a di deviare istantaneamente da un segmento gi\`a iniziato.
+
+In termini ingegneristici, \eqref{eq:dispatch} \`e un \emph{inserimento greedy a orizzonte mobile}, non la soluzione globale esatta all'intera giornata. Il problema completo combinatorio \`e in generale troppo costoso per essere risolto esattamente a ogni nuovo utente. Una versione MPC con orizzonte \(H\) e previsione \(\widehat\lambda\) pu\`o ottimizzare:
+\begin{equation}
+\min_{\{S_e\}}\;\mathbb E\!\left[\sum_{r\in[t,t+H]}
+\bigl(W_r+\alpha R_r+\gamma\pos{W_r-w_0}^2\bigr)
++\eta\sum_e D_e\;\middle|\;\widehat\lambda(t:t+H)\right]
+\end{equation}
+con penalit\`a energetica \(\eta D_e\); \textbf{questa estensione MPC non \`e implementata} nel codice di confronto. La formulazione serve come passo successivo di ricerca.
+
+\subsection{La variabile addizionale: domanda futura prevista}
+Si sceglie \(\widehat\lambda_f(t+\tau)\), intensit\`a delle nuove chiamate per piano e per orizzonte \(\tau\). Le cabine inattive possono essere posizionate a 0, 5, 10 e 15 per ridurre i tempi di risposta stimati. Nel \emph{prototipo effettivo}, questa regola \`e una semplice euristica di fasce orarie basata su inizio/fine lavori e pranzi, con attesa di inattivit\`a di 35 s. Non \`e un modello ML con apprendimento online: la NNLS viene usata nei grafici, \textbf{non} per pilotare il parcheggio nel simulatore.
+\newpage
+\secname{Algoritmo eseguibile e confronto corretto}
+\subsection{Sequenza operativa per ogni nuova chiamata}
+\begin{enumerate}[leftmargin=7mm]
+\item Acquisire \(t,o,z\), assegnare identificativo univoco; aggiornare stato di cabine, fermate, carichi misurati e utenti gi\`a assegnati.
+\item Per \(e=1,\ldots,4\), enumerare le posizioni di inserimento \(i<j\), escludendo inversioni del segmento in corso e violazioni di capienza \emph{prevista} a ogni fermata.
+\item Per ogni itinerario fattibile calcolare ETA di imbarco, ETA di sbarco e ritardo indotto sulle assegnazioni gi\`a esistenti. Valutare \(\Delta J_t\) in \eqref{eq:dispatch}.
+\item Confermare l'inserimento a costo marginale minimo. Quando si apre la porta, controllare con massa \emph{effettiva} e contatore persone; se il prelievo non \`e possibile, mantenere la chiamata pendente e ricalcolarla.
+\item Quando una cabina non ha compiti e resta inattiva per 35 s, applicare il parcheggio predittivo per fascia. Ripetere a ogni evento, senza spostare un'auto che sta gi\`a percorrendo il segmento corrente.
+\end{enumerate}
+\subsection{Politiche comparate}
+\begin{tabularx}{\linewidth}{@{}p{35mm}X X@{}}
+\toprule
+ & \textbf{Reattiva: benchmark} & \textbf{Ottimizzata: proposta}\\
+\midrule
+Ingressi & Identiche richieste OD e masse, stessi semi & Identiche richieste OD e masse, stessi semi\\
+Assegnazione & Inserimento compatibile che minimizza ETA nuovo + 0,28 viaggio nuovo + 0,32 ritardi aggiunti & Minimo costo marginale complessivo \eqref{eq:objective}, con penale per attese lunghe\\
+Controllo capienza & Verifica preventiva di massa riservata e verifica effettiva all'ingresso & Idem; controllo effettivo identico\\
+Attesa cabina libera & Resta al piano dell'ultima fermata & Riposizionamento a fasce programmate\\
+Interpretazione & Euristica comparativa costruita per questo studio & Prototipo comparativo costruito per questo studio\\
+\bottomrule
+\end{tabularx}
+\textbf{Avvertenza sulla causalit\`a:} il confronto misura il \emph{pacchetto} di variazioni (obiettivo + parcheggio), non l'effetto separato di ciascun componente. Non equiparare la baseline all'algoritmo di un costruttore commerciale o a tutti gli ascensori esistenti.
+
+\subsection{Replica e metrica statistica}
+Otto semi indipendenti: 101, 202, 303, 404, 505, 606, 707, 808. Ogni replica produce richieste sintetiche per \Nstaff\ impiegati di \Noffices\ uffici con arrivi mattutini, pause e rientri, uscite serali e spostamenti interni. Per evitare confronti non appaiati, \emph{lo stesso campione esatto} \`e elaborato da entrambe le politiche. Si riportano medie di replica, percentile al 95\%, quota con attesa oltre 120 s e intervallo al 95\% sulla differenza \emph{appaiata tra otto medie giornaliere} (t di Student; intervallo esplorativo, non una garanzia di copertura su dati reali).
+\newpage
+\secname{Risultati numerici della simulazione}
+\begin{table}[H]\centering\small
+\begin{tabularx}{\linewidth}{@{}Xrr@{}}
+\toprule
+\textbf{Indicatore (media su 8 repliche)} & \textbf{Reattiva} & \textbf{Ottimizzata}\\
+\midrule
+Passeggeri completati / giorno & \Nreq & \Nreq\\
+Attesa media [s] & \Wbase & \Wopt\\
+Attesa mediana [s] & \MedBase & \MedOpt\\
+90\textsuperscript{o} percentile attesa [s] & \PninBase & \PninOpt\\
+95\textsuperscript{o} percentile attesa [s] & \Pbase & \Popt\\
+Quota attesa \(>120\) s [\%] & \TailBase & \TailOpt\\
+Tempo medio in cabina [s] & \Rbase & \Ropt\\
+Tempo totale medio ingresso--uscita [s] & \Tbase & \Topt\\
+Fermate con apertura porte / giorno & \StopBase & \StopOpt\\
+Piani percorsi dalle cabine / giorno & \DistBase & \DistOpt\\
+Piani percorsi per riposizionamento & \ParkBase & \ParkOpt\\
+Tentativi di imbarco respinti per carico & \BypassBase & \BypassOpt\\
+\bottomrule
+\end{tabularx}
+\caption{Valori prodotti dal codice incluso; dati sintetici. Nessuna misura fisica dell'impianto.}
+\end{table}
+Riduzione media appaiata dell'attesa: \textbf{\DiffW\,s} (intervallo esplorativo 95\%: \CILow--\CIHigh\,s); riduzione relativa delle medie: \textbf{\RelGain\%}. La forte asimmetria della baseline tra media e mediana segnala chiamate rare ma estremamente penalizzate; il benchmark \`e deliberatamente reattivo, pertanto \textbf{non} \`e una stima universale del miglioramento rispetto a impianti moderni.
+\Fig{grafico_02_attese_orarie.pdf}{Attesa media per fasce di 30 minuti dall'origine della chiamata. Le code mattutine, di pranzo e serali vanno valutate separatamente.}
+\newpage
+\secname{Distribuzioni, stabilit\`a e coda lunga}
+\Fig{grafico_03_cdf_attese.pdf}{Funzione di ripartizione empirica dei tempi di attesa per tutte le chiamate sintetiche delle 8 giornate. L'asse orizzontale si ferma a 500 s: una parte della coda del benchmark pu\`o estendersi oltre.}
+\Fig{grafico_04_repliche.pdf}{Media di attesa per replica, con gli stessi semi per le due politiche. Lo scarto fra giornate \`e parte della variabilit\`a simulata.}
+\subsection*{Capienza: assenza di bypass non significa assenza del vincolo}
+Il modello applica una riserva conservativa al momento della prenotazione: nello scenario base non si sono verificati tentativi respinti per peso, pur essendo attiva la regola di bypass. \`E un esito dello scenario selezionato, non prova che il problema dei sovraccarichi non possa verificarsi. Per una verifica utile sono necessari stress test con aumento degli addetti, cabine fuori servizio, carichi molto variabili e richieste simultanee.
+\newpage
+\secname{Sensibilit\`a alla portata e punto di saturazione}
+Usando solo come \emph{screening} un ciclo \(\mathrm{RTT}=145\,s\) \textbf{ipotizzato}, una capienza media prudenziale
+\(P_{\rm robust}(Q)=\min\{C,\lfloor\rho Q/\widetilde w\rfloor\}\) suggerisce:
+\begin{equation}
+\mathrm{HC}_{5\min}(Q)=\frac{300\,m}{145}\min\left\{13,\left\lfloor\frac{0{,}96Q}{87}\right\rfloor\right\}.
+\end{equation}
+\Fig{grafico_05_capacita_kg.pdf}{Screening del numero trasportabile ogni 5 minuti al variare della portata Q. RTT = 145 s ipotizzato e costante, non misurato. La domanda \`e il massimo flusso in salita per 5 minuti, media degli otto scenari.}
+Alla portata assunta di 1\,000 kg, il calcolo teorico d\`a circa \textbf{91 persone/5 min}; il massimo flusso sintetico in salita \`e circa \textbf{71 persone/5 min}, in media sulle otto repliche. Non basta che \(\mathrm{HC}\) superi il massimo in un intervallo: sono determinanti ordine delle fermate, intensit\`a di ritorno, attesa accumulata e carichi effettivi. \textbf{Il RTT di 145 s non \`e stato stimato dal log degli ascensori.}
+
+\subsection{Tre perturbazioni da testare prima di qualsiasi deployment}
+\begin{enumerate}[leftmargin=7mm]
+\item \textbf{Domanda:} raddoppio di \(N_f\), spostamento di tutte le pause alle 13:00, arrivi con deviazioni standard dimezzate; valutare \(W_{95}\) e la coda non servita.
+\item \textbf{Disponibilit\`a:} una cabina in manutenzione, \(m=3\); validare stabilit\`a e politiche di priorit\`a.
+\item \textbf{Massa e accessibilit\`a:} variazione della distribuzione dei pesi, utenti con maggior tempo di imbarco/sbarco, passeggini e ingombri; il vincolo dei posti e delle masse da soli non basta.
+\end{enumerate}
+\newpage
+
+\newpage
+\secname{Estensione: numero variabile di uffici e abitudini locali}
+Il piano non coincide necessariamente con l'ufficio. Sia $\mathcal O=\{1,\ldots,n_O\}$ l'insieme delle unita' operative, con $n_O$ \emph{variabile} e indipendente dai 15 piani. Ogni ufficio $o$ possiede un identificatore, piano $f_o$, persone $N_o$, fascia di pranzo dichiarata $h_o$ e quota di uscita $p_o$. Piu' uffici possono occupare lo stesso piano:
+\begin{equation}
+ N_f=\sum_{o=1}^{n_O}N_o\,\mathbf 1\{f_o=f\},\qquad
+ \lambda_f^{\downarrow}(t)=\sum_{o:f_o=f}\lambda_o^{\rm pranzo}(t).
+\end{equation}
+\textbf{Scenario riproducibile:} \Noffices\ uffici e \Nstaff\ addetti; l'ufficio \texttt{\Nfocus}\ al piano \Nfocusfloor\ ha 65 addetti e pausa dichiarata alle 13:00. Gli altri uffici hanno dimensione, piano e fascia di pranzo assegnati in automatico. Questi numeri sono esempi e si possono modificare nel JSON, anche fornendo un elenco esplicito di uffici anziche' il generatore automatico.
+
+\subsection{Apprendimento delle abitudini senza tracciare i dipendenti}
+Il motore riceve \emph{conteggi aggregati di richieste attribuibili a ufficio}, non nomi di persone. Nei dati sintetici, la pausa vera e' deviata stabilmente dall'orario dichiarato; per la previsione, questo scostamento e' sconosciuto. Con $n_o$ chiamate storiche di pranzo, media campionaria $\overline t_o$, peso a priori $\kappa$ e orario dichiarato $h_o$:
+\begin{align}
+\widehat\mu_o&=\frac{n_o\overline t_o+\kappa h_o}{n_o+\kappa}, &
+\widehat p_o&=\frac{n_o+\alpha p_o}{D\,N_o+\alpha},\\
+\widehat\sigma_o^2&=\frac{n_os_o^2+\kappa\sigma_0^2}{n_o+\kappa}, &
+\widehat\lambda_o(t)&=N_o\widehat p_o\,\varphi_{\widehat\sigma_o}(t-\widehat\mu_o).
+\end{align}
+$D$ = numero di giorni storici, $\alpha$ = esposizione a priori in persone-giorno; $s_o$ e' la deviazione delle chiamate nel campione. Se $n_o=0$, il modello ritorna al programma dichiarato. La stima e' ricalcolabile ogni giorno su una finestra storica mobile, ma in questa simulazione e' \textbf{addestrata una sola volta}, prima di test e controllo.
+
+\textbf{Prerequisito di osservabilita':} una chiamata tradizionale per piano non identifica automaticamente quale ufficio l'abbia generata. La stima per ufficio richiede un segnale aggregato autorizzato (ad esempio contapersone di zona, prenotazioni di gruppo o dato gestionale condiviso). In sua assenza il modello deve aggregare al solo piano, senza inventare identita' individuali.
+
+\newpage
+\secname{Best fit di apprendimento: programma vs comportamento}
+Per evitare una verifica circolare, la funzione di previsione e' calibrata su \textbf{12 giornate sintetiche} e misurata su \textbf{4 giornate sintetiche diverse}, non usate nell'apprendimento. L'errore assoluto medio viene calcolato separatamente per ogni ufficio in intervalli di 5 minuti. E' una prova di funzionamento dell'algoritmo, non una misura ottenuta dal palazzo.
+
+\Fig{grafico_06_fit_abitudini_ufficio.pdf}{Esempio del singolo ufficio principale: richieste per blocco di 5 min sulle giornate di validazione, previsione centrata sull'orario dichiarato e previsione adattata agli storici. La dispersione dei conteggi e' simulata.}
+
+\begin{center}\begin{tabular}{@{}lr@{}}\toprule
+\textbf{Test su tutti gli uffici (5 min)}&\textbf{MAE [richieste/blocco/ufficio]}\\\midrule
+Solo fascia dichiarata & \StaticOfficeMAE\\
+Apprendimento con shrinkage & \LearnedOfficeMAE\\
+Riduzione errore nel caso sintetico & \OfficeLearnGain\%\\
+\bottomrule\end{tabular}\end{center}
+Questa riduzione e' \textbf{fuori campione, ma su dati artificiali}; puo' non ripetersi con assenze, turni che cambiano, riunioni, festivita' o occupazione non osservata. Il sistema deve monitorare la deriva degli errori e ridurre l'anticipo se la confidenza scende.
+
+\subsection{Domanda anticipata verso pranzo e rientro}
+La stima attesa delle richieste in un orizzonte futuro $H$ con anticipo $L$ e':
+\begin{equation}
+\widehat D_o(t;L,H)=N_o\widehat p_o\left[\Phi\!\left(\frac{t+L+H-\widehat\mu_o}{\widehat\sigma_o}\right)-\Phi\!\left(\frac{t+L-\widehat\mu_o}{\widehat\sigma_o}\right)\right].
+\end{equation}
+Le destinazioni dal piano terra sono previste allo stesso modo, traslando la media di 60 minuti. Le previsioni di uffici sullo stesso piano vengono \emph{sommate}; la priorita' reale rimane alle richieste gia' in coda e ai passeggeri imbarcati.
+
+\newpage
+\secname{Raggruppamento automatico delle cabine per ufficio}
+La scelta proattiva e' un problema intero di allocazione di cabine \emph{inattive}. Con $x_{ef}\in\{0,1\}$ cabina $e$ inviata al piano $f$, $k_f=\sum_e x_{ef}$ e $D_f=\sum_{o:f_o=f}\widehat D_o$, il guadagno approssimato di copertura del piano e':
+\begin{equation}
+G_f(k_f)=30\,\frac{D_f^{1.25}-[D_f-q k_f]_+^{1.25}}{\max(1,D_f^{0.25})},\quad q=0.82\min\!\left(C,\left\lfloor\frac{\rho Q}{\widetilde w}\right\rfloor\right).
+\end{equation}
+Con tempi di trasferimento $T_{ef}$ e distanza $d_{ef}$ il problema di parking e':
+\begin{align}
+\max_x\quad &\sum_f G_f(k_f)-0.10\sum_{ef}T_{ef}x_{ef}-0.10\sum_{ef}d_{ef}x_{ef}\\
+\mathrm{s.t.}\quad &\sum_f x_{ef}\le1,\quad\sum_{ef}x_{ef}\le m_{\rm idle}-1,\quad k_f\le3.
+\end{align}
+Nel codice la soluzione e' una \emph{euristica greedy marginale}, non una dimostrazione di ottimo globale. Una cabina inattiva e' sempre riservata alla copertura diffusa; le altre possono concentrarsi in anticipo, fino a tre sullo stesso piano. $q$ e' una capacita' operativa ipotizzata di breve periodo, distinta dal limite di carico \emph{rigido} del sensore.
+
+\Fig{grafico_07_raggruppamento_uffici.pdf}{Sopra: fit della domanda appresa per ufficio, mostrando i 12 piu' intensi ma calcolando tutti i \Noffices. Sotto: numero intero di cabine destinate ai piani con maggiore domanda, tramite la stessa regola del motore. Scenario illustrativo con tutte e quattro le cabine inizialmente libere e parcheggiate in zona.}
+
+\textbf{Interpreta correttamente il raggruppamento:} piu' uffici al piano 12 condividono le cabine inviate a quel piano. La stima non autorizza blocchi esclusivi delle cabine a favore di un'impresa; quando compare una chiamata effettiva, l'instradamento e i vincoli in kg prevalgono sempre. Il picco di preposizionamento previsto al piano \Nfocusfloor\ nello scenario e' \MaxPredGroup\ cabine.
+
+\newpage
+\secname{Test end-to-end: politica adattiva}
+Tre politiche utilizzano \emph{esattamente gli stessi arrivi e le stesse masse} sulle otto repliche: reattiva, ottimizzata con parcheggio per fascia, e adattiva con previsione per ufficio. L'ultima differisce solo nella decisione di riposizionamento delle cabine inattive: l'assegnazione delle chiamate resta identica alla politica ottimizzata, cosi' da isolare la nuova componente.
+\begin{table}[H]\centering\small
+\begin{tabularx}{\linewidth}{@{}Xrrr@{}}\toprule
+Indicatore (media sulle repliche) & Reattiva & Per fasce & Per ufficio\\\midrule
+Attesa media [s] & \Wbase & \Wopt & \Wadapt\\
+95\textsuperscript{o} percentile attesa [s] & \Pbase & \Popt & \PAdapt\\
+Viaggio medio a bordo [s] & \Rbase & \Ropt & \RAdapt\\
+Tempo totale medio [s] & \Tbase & \Topt & \TAdapt\\
+Piani di parcheggio percorsi & \ParkBase & \ParkOpt & \ParkAdapt\\
+Piani percorsi totali & \DistBase & \DistOpt & \DistAdapt\\
+Imbarchi respinti (peso) & \BypassBase & \BypassOpt & \BypassAdapt\\
+\bottomrule\end{tabularx}
+\caption{Confronto appaiato, ma puramente sintetico. Non confondere l'errore di forecast con le prestazioni complessive del controllo.}
+\end{table}
+La logica adattiva viene ricomputata solo dopo un periodo di inattivita'; \emph{non interrompe} movimenti gia' in corso. Il massimo raggruppamento medio effettivamente pianificato in simulazione e' \GroupObserved\ cabine (non il massimo teorico della figura). Il modello non controlla fermate di sicurezza, sovraccarichi, incendi, manutenzione o accessibilita', e non e' pronto alla connessione diretta di un PLC.
+
+\textbf{Limiti della validazione:} l'addestramento apprende flussi creati dalla stessa famiglia generativa; nessun miglioramento simulato e' una previsione affidabile dell'edificio prima di taratura con misure, replay ciechi, prove di robustezza e approvazione tecnica.
+
+\secname{Personalizzazione dei parametri e messa in opera}
+Il materiale fornito comprende \texttt{parametri\_ascensori.json} e il simulatore Python. Cambiare il numero di uffici (o fornirne un elenco esplicito), i piani, gli addetti e gli orari nel JSON e ripetere la simulazione: i fit per ufficio, le allocazioni, le figure e il rapporto vengono rigenerati dalla procedura allegata. \emph{Sono parametri di ricerca, non setpoint di un controller certificato.}
+\begin{table}[H]\centering\small
+\begin{tabularx}{\linewidth}{@{}p{55mm}X@{}}
+\toprule
+\textbf{Chiave JSON} & \textbf{Effetto sul modello}\\
+\midrule
+\texttt{building.upper\_floors} & Numero piani sopra 0\\
+\texttt{building.number\_of\_elevators} & Numero di cabine (il parcheggio \`e euristico per 4; per altri numeri va adattato)\\
+\texttt{offices.number\_of\_offices} & Numero variabile di uffici, se non si definisce l\textquotesingle elenco esplicito\\
+\texttt{elevators.rated\_load\_kg} & Limite rigido del carico rilevato\\
+\texttt{elevators.max\_people} & Limite rigido di occupanti\\
+\texttt{elevators.speed\_m\_s} & Velocit\`a nominale\\
+\shortstack[l]{\texttt{elevators.robust\_reserved\_}\\\texttt{kg\_per\_future\_passenger}} & Riserva preventiva per richiesta\\
+\texttt{offices.definitions} & Elenco opzionale di uffici: ID, piano, organico, pausa e partecipazione\\
+\shortstack[l]{\texttt{traffic.lunch\_start\_}\\\texttt{probabilities}} & Quote (normalizzate automaticamente)\\
+\texttt{traffic.lunch\_participation} & Frazione addetti che pranzano fuori piano\\
+\shortstack[l]{\texttt{traffic.lunch\_duration\_}\\\texttt{minutes}} & Durata media esatta nello scenario\\
+\texttt{offices.training\_day\_seeds} & Giornate per apprendere la domanda specifica\\
+\texttt{offices.validation\_day\_seeds} & Giornate indipendenti per verificare il fit\\
+\texttt{experiment.seeds} & Giorni stocastici riproducibili\\
+\bottomrule
+\end{tabularx}
+\end{table}
+\textbf{Avvio rapido} in una cartella con i file sorgente, Python 3.10+ e \texttt{lualatex} disponibili:
+\begin{quote}\small\ttfamily
+pip install numpy scipy matplotlib\\
+python crea\_rapporto.py --config parametri\_ascensori.json
+\end{quote}
+\texttt{crea\_rapporto.py} esegue il motore, addestra il modello su giornate storiche sintetiche, aggiorna grafici e numeri del PDF. Tutti i coefficienti del fit e le metriche replica per replica rimangono nel JSON e nel CSV dei risultati.
+
+\textbf{Percorso di adozione sul campo:} raccolta log anonimi; taratura parametri; replay offline su settimane non usate nella taratura; test di guasto e sovraccarico; validazione con progettista ascensorista e fornitore del controllore; test pilota e misura dei KPI. I comandi di sicurezza, la normativa applicabile, le operazioni per persone a mobilit\`a ridotta e l'integrazione con antincendio restano di competenza del sistema certificato.
+\secname{Riferimenti e confini della metodologia}
+\begin{enumerate}[leftmargin=7mm]\small
+\item ISO, \emph{ISO 8100-32:2020 --- Planning and selection of passenger lifts to be installed in office, hotel and residential buildings}. Standard pubblicato nel 2020, confermato nel 2025. Descrive criteri di pianificazione e metodi di calcolo/simulazione; \textbf{non} convalida questo codice. \url{https://www.iso.org/standard/73084.html}.
+\item CIBSE, \emph{Guide D: Transportation Systems in Buildings} (2025), sezioni dedicate a calcolo, simulazione e controllo. \href{https://www.cibse.org/knowledge-research/knowledge-portal/guide-d-transportation-systems-in-buildings-2025/}{CIBSE: scheda Guide D 2025}.
+\item CIBSE, \emph{Guide D9: Lift traffic control} (2025). \href{https://www.cibse.org/knowledge-research/knowledge-portal/guide-d9-lift-traffic-control-2025/}{CIBSE: scheda Guide D9 2025}.
+\item Codice sorgente allegato \texttt{simulatore\_ascensori.py}: definizioni operative, eventi, politica di benchmark, politica proposta, numero di repliche e fit NNLS. \emph{Fornisce risultati illustrativi, non una prova di conformit\`a agli standard sopra citati.}
+\end{enumerate}
+\end{document}

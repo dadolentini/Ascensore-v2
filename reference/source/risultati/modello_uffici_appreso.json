@@ -1,0 +1,557 @@
+{
+  "note": "Parametri appresi esclusivamente da giorni training sintetici. Non contiene identificativi individuali.",
+  "metrics": {
+    "train_days": 12,
+    "holdout_days": 4,
+    "mae_office_5min_schedule": 0.2658641925325042,
+    "mae_office_5min_learned": 0.19734675556207346,
+    "focus_office_id": "U12-FOCUS",
+    "focus_true_habit_hour": 13.179553878840435,
+    "focus_learned_hour": 13.196241258980468,
+    "focus_scheduled_hour": 13.0
+  },
+  "offices": [
+    {
+      "id": "U12-FOCUS",
+      "floor": 12,
+      "employees": 65,
+      "lunch_start_hour": 13.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 10.773232730426093
+    },
+    {
+      "id": "U01",
+      "floor": 1,
+      "employees": 16,
+      "lunch_start_hour": 13.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 9.670351332629858
+    },
+    {
+      "id": "U02",
+      "floor": 2,
+      "employees": 16,
+      "lunch_start_hour": 12.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 1.1616004632741557
+    },
+    {
+      "id": "U03",
+      "floor": 3,
+      "employees": 16,
+      "lunch_start_hour": 14.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 3.9428221876977303
+    },
+    {
+      "id": "U04",
+      "floor": 4,
+      "employees": 16,
+      "lunch_start_hour": 13.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 7.552549611048174
+    },
+    {
+      "id": "U05",
+      "floor": 5,
+      "employees": 16,
+      "lunch_start_hour": 12.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 1.3828192911644617
+    },
+    {
+      "id": "U06",
+      "floor": 6,
+      "employees": 16,
+      "lunch_start_hour": 14.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -15.967228344413474
+    },
+    {
+      "id": "U07",
+      "floor": 7,
+      "employees": 16,
+      "lunch_start_hour": 13.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -5.159795908356518
+    },
+    {
+      "id": "U08",
+      "floor": 8,
+      "employees": 16,
+      "lunch_start_hour": 12.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -9.166985905798908
+    },
+    {
+      "id": "U09",
+      "floor": 9,
+      "employees": 16,
+      "lunch_start_hour": 14.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -10.535923615121044
+    },
+    {
+      "id": "U10",
+      "floor": 10,
+      "employees": 16,
+      "lunch_start_hour": 13.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 3.08694706951983
+    },
+    {
+      "id": "U11",
+      "floor": 11,
+      "employees": 16,
+      "lunch_start_hour": 12.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -2.6733668276872287
+    },
+    {
+      "id": "U12",
+      "floor": 12,
+      "employees": 16,
+      "lunch_start_hour": 14.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 6.824200074455486
+    },
+    {
+      "id": "U13",
+      "floor": 13,
+      "employees": 16,
+      "lunch_start_hour": 13.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 0.9688246793877675
+    },
+    {
+      "id": "U14",
+      "floor": 14,
+      "employees": 16,
+      "lunch_start_hour": 12.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 2.7845880557422547
+    },
+    {
+      "id": "U15",
+      "floor": 15,
+      "employees": 16,
+      "lunch_start_hour": 14.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 7.624508379615289
+    },
+    {
+      "id": "U16",
+      "floor": 1,
+      "employees": 16,
+      "lunch_start_hour": 13.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -17.09867916555742
+    },
+    {
+      "id": "U17",
+      "floor": 2,
+      "employees": 16,
+      "lunch_start_hour": 12.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -9.131346381234192
+    },
+    {
+      "id": "U18",
+      "floor": 3,
+      "employees": 16,
+      "lunch_start_hour": 14.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -19.0
+    },
+    {
+      "id": "U19",
+      "floor": 4,
+      "employees": 16,
+      "lunch_start_hour": 13.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 3.9741717020319043
+    },
+    {
+      "id": "U20",
+      "floor": 5,
+      "employees": 16,
+      "lunch_start_hour": 12.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 19.0
+    },
+    {
+      "id": "U21",
+      "floor": 6,
+      "employees": 16,
+      "lunch_start_hour": 14.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 5.046099318888075
+    },
+    {
+      "id": "U22",
+      "floor": 7,
+      "employees": 16,
+      "lunch_start_hour": 13.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 10.702840077349519
+    },
+    {
+      "id": "U23",
+      "floor": 8,
+      "employees": 16,
+      "lunch_start_hour": 12.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 1.7194786975652914
+    },
+    {
+      "id": "U24",
+      "floor": 9,
+      "employees": 16,
+      "lunch_start_hour": 14.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -14.012007275050786
+    },
+    {
+      "id": "U25",
+      "floor": 10,
+      "employees": 16,
+      "lunch_start_hour": 13.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 7.306685945832638
+    },
+    {
+      "id": "U26",
+      "floor": 11,
+      "employees": 15,
+      "lunch_start_hour": 12.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -13.500741573060955
+    },
+    {
+      "id": "U27",
+      "floor": 12,
+      "employees": 15,
+      "lunch_start_hour": 14.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -0.40677207622000894
+    },
+    {
+      "id": "U28",
+      "floor": 13,
+      "employees": 15,
+      "lunch_start_hour": 13.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": -3.454881648378077
+    },
+    {
+      "id": "U29",
+      "floor": 14,
+      "employees": 15,
+      "lunch_start_hour": 12.0,
+      "lunch_participation": 0.72,
+      "habit_offset_minutes": 4.681845840369171
+    }
+  ],
+  "models": [
+    {
+      "id": "U12-FOCUS",
+      "floor": 12,
+      "employees": 65,
+      "scheduled_hour": 13.0,
+      "estimated_hour": 13.196241258980468,
+      "estimated_sigma_hours": 0.1591076079227744,
+      "estimated_participation": 0.7129292929292929,
+      "historical_lunch_calls": 556
+    },
+    {
+      "id": "U01",
+      "floor": 1,
+      "employees": 16,
+      "scheduled_hour": 13.0,
+      "estimated_hour": 13.144742204482558,
+      "estimated_sigma_hours": 0.15332284356556325,
+      "estimated_participation": 0.7678431372549019,
+      "historical_lunch_calls": 148
+    },
+    {
+      "id": "U02",
+      "floor": 2,
+      "employees": 16,
+      "scheduled_hour": 12.0,
+      "estimated_hour": 12.008884683644588,
+      "estimated_sigma_hours": 0.16172721245218813,
+      "estimated_participation": 0.7580392156862744,
+      "historical_lunch_calls": 146
+    },
+    {
+      "id": "U03",
+      "floor": 3,
+      "employees": 16,
+      "scheduled_hour": 14.0,
+      "estimated_hour": 14.028924431232948,
+      "estimated_sigma_hours": 0.14824614350713636,
+      "estimated_participation": 0.6796078431372549,
+      "historical_lunch_calls": 130
+    },
+    {
+      "id": "U04",
+      "floor": 4,
+      "employees": 16,
+      "scheduled_hour": 13.0,
+      "estimated_hour": 13.096027130294445,
+      "estimated_sigma_hours": 0.14896758583830352,
+      "estimated_participation": 0.728627450980392,
+      "historical_lunch_calls": 140
+    },
+    {
+      "id": "U05",
+      "floor": 5,
+      "employees": 16,
+      "scheduled_hour": 12.0,
+      "estimated_hour": 11.99972725103125,
+      "estimated_sigma_hours": 0.15000307381910705,
+      "estimated_participation": 0.6992156862745097,
+      "historical_lunch_calls": 134
+    },
+    {
+      "id": "U06",
+      "floor": 6,
+      "employees": 16,
+      "scheduled_hour": 14.0,
+      "estimated_hour": 13.755850512816021,
+      "estimated_sigma_hours": 0.156108691030095,
+      "estimated_participation": 0.6796078431372549,
+      "historical_lunch_calls": 130
+    },
+    {
+      "id": "U07",
+      "floor": 7,
+      "employees": 16,
+      "scheduled_hour": 13.0,
+      "estimated_hour": 12.917716552305563,
+      "estimated_sigma_hours": 0.1493341911532404,
+      "estimated_participation": 0.7090196078431372,
+      "historical_lunch_calls": 136
+    },
+    {
+      "id": "U08",
+      "floor": 8,
+      "employees": 16,
+      "scheduled_hour": 12.0,
+      "estimated_hour": 11.876524215641503,
+      "estimated_sigma_hours": 0.1444178406153921,
+      "estimated_participation": 0.7139215686274509,
+      "historical_lunch_calls": 137
+    },
+    {
+      "id": "U09",
+      "floor": 9,
+      "employees": 16,
+      "scheduled_hour": 14.0,
+      "estimated_hour": 13.86085991778071,
+      "estimated_sigma_hours": 0.1498512871878568,
+      "estimated_participation": 0.7139215686274509,
+      "historical_lunch_calls": 137
+    },
+    {
+      "id": "U10",
+      "floor": 10,
+      "employees": 16,
+      "scheduled_hour": 13.0,
+      "estimated_hour": 13.024651871912658,
+      "estimated_sigma_hours": 0.16550450006889317,
+      "estimated_participation": 0.7384313725490196,
+      "historical_lunch_calls": 142
+    },
+    {
+      "id": "U11",
+      "floor": 11,
+      "employees": 16,
+      "scheduled_hour": 12.0,
+      "estimated_hour": 11.988455733913389,
+      "estimated_sigma_hours": 0.15708366359743145,
+      "estimated_participation": 0.694313725490196,
+      "historical_lunch_calls": 133
+    },
+    {
+      "id": "U12",
+      "floor": 12,
+      "employees": 16,
+      "scheduled_hour": 14.0,
+      "estimated_hour": 14.103632093996286,
+      "estimated_sigma_hours": 0.15058250945291896,
+      "estimated_participation": 0.7580392156862744,
+      "historical_lunch_calls": 146
+    },
+    {
+      "id": "U13",
+      "floor": 13,
+      "employees": 16,
+      "scheduled_hour": 13.0,
+      "estimated_hour": 13.030928891096204,
+      "estimated_sigma_hours": 0.15108101456956258,
+      "estimated_participation": 0.694313725490196,
+      "historical_lunch_calls": 133
+    },
+    {
+      "id": "U14",
+      "floor": 14,
+      "employees": 16,
+      "scheduled_hour": 12.0,
+      "estimated_hour": 12.030152685479493,
+      "estimated_sigma_hours": 0.15724785917080042,
+      "estimated_participation": 0.7433333333333333,
+      "historical_lunch_calls": 143
+    },
+    {
+      "id": "U15",
+      "floor": 15,
+      "employees": 16,
+      "scheduled_hour": 14.0,
+      "estimated_hour": 14.112919152261732,
+      "estimated_sigma_hours": 0.16010587169706572,
+      "estimated_participation": 0.7335294117647058,
+      "historical_lunch_calls": 141
+    },
+    {
+      "id": "U16",
+      "floor": 1,
+      "employees": 16,
+      "scheduled_hour": 13.0,
+      "estimated_hour": 12.735323665974116,
+      "estimated_sigma_hours": 0.14402212476125573,
+      "estimated_participation": 0.7531372549019607,
+      "historical_lunch_calls": 145
+    },
+    {
+      "id": "U17",
+      "floor": 2,
+      "employees": 16,
+      "scheduled_hour": 12.0,
+      "estimated_hour": 11.87102348612567,
+      "estimated_sigma_hours": 0.15923633698154388,
+      "estimated_participation": 0.7090196078431372,
+      "historical_lunch_calls": 136
+    },
+    {
+      "id": "U18",
+      "floor": 3,
+      "employees": 16,
+      "scheduled_hour": 14.0,
+      "estimated_hour": 13.749370910108519,
+      "estimated_sigma_hours": 0.14137020423535698,
+      "estimated_participation": 0.728627450980392,
+      "historical_lunch_calls": 140
+    },
+    {
+      "id": "U19",
+      "floor": 4,
+      "employees": 16,
+      "scheduled_hour": 13.0,
+      "estimated_hour": 13.066552452372477,
+      "estimated_sigma_hours": 0.1515286178597043,
+      "estimated_participation": 0.6747058823529412,
+      "historical_lunch_calls": 129
+    },
+    {
+      "id": "U20",
+      "floor": 5,
+      "employees": 16,
+      "scheduled_hour": 12.0,
+      "estimated_hour": 12.225208968093199,
+      "estimated_sigma_hours": 0.16126513778981447,
+      "estimated_participation": 0.6649019607843136,
+      "historical_lunch_calls": 127
+    },
+    {
+      "id": "U21",
+      "floor": 6,
+      "employees": 16,
+      "scheduled_hour": 14.0,
+      "estimated_hour": 14.059453247643015,
+      "estimated_sigma_hours": 0.14882968034123298,
+      "estimated_participation": 0.7629411764705881,
+      "historical_lunch_calls": 147
+    },
+    {
+      "id": "U22",
+      "floor": 7,
+      "employees": 16,
+      "scheduled_hour": 13.0,
+      "estimated_hour": 13.139401746391453,
+      "estimated_sigma_hours": 0.1482228422727207,
+      "estimated_participation": 0.7384313725490196,
+      "historical_lunch_calls": 142
+    },
+    {
+      "id": "U23",
+      "floor": 8,
+      "employees": 16,
+      "scheduled_hour": 12.0,
+      "estimated_hour": 12.023221497645332,
+      "estimated_sigma_hours": 0.1703902509546529,
+      "estimated_participation": 0.7188235294117646,
+      "historical_lunch_calls": 138
+    },
+    {
+      "id": "U24",
+      "floor": 9,
+      "employees": 16,
+      "scheduled_hour": 14.0,
+      "estimated_hour": 13.802818373840598,
+      "estimated_sigma_hours": 0.1707724472667271,
+      "estimated_participation": 0.7237254901960783,
+      "historical_lunch_calls": 139
+    },
+    {
+      "id": "U25",
+      "floor": 10,
+      "employees": 16,
+      "scheduled_hour": 13.0,
+      "estimated_hour": 13.105012002928545,
+      "estimated_sigma_hours": 0.16359773768980782,
+      "estimated_participation": 0.7384313725490196,
+      "historical_lunch_calls": 142
+    },
+    {
+      "id": "U26",
+      "floor": 11,
+      "employees": 15,
+      "scheduled_hour": 12.0,
+      "estimated_hour": 11.79487613525091,
+      "estimated_sigma_hours": 0.1499188924639934,
+      "estimated_participation": 0.7637499999999999,
+      "historical_lunch_calls": 138
+    },
+    {
+      "id": "U27",
+      "floor": 12,
+      "employees": 15,
+      "scheduled_hour": 14.0,
+      "estimated_hour": 13.986662723861908,
+      "estimated_sigma_hours": 0.15134606245759727,
+      "estimated_participation": 0.6960416666666666,
+      "historical_lunch_calls": 125
+    },
+    {
+      "id": "U28",
+      "floor": 13,
+      "employees": 15,
+      "scheduled_hour": 13.0,
+      "estimated_hour": 12.964485228015581,
+      "estimated_sigma_hours": 0.16244676860723334,
+      "estimated_participation": 0.7168749999999999,
+      "historical_lunch_calls": 129
+    },
+    {
+      "id": "U29",
+      "floor": 14,
+      "employees": 15,
+      "scheduled_hour": 12.0,
+      "estimated_hour": 12.0604536129082,
+      "estimated_sigma_hours": 0.15425598681671124,
+      "estimated_participation": 0.7585416666666666,
+      "historical_lunch_calls": 137
+    }
+  ]
+}

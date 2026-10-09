@@ -1,0 +1,2 @@
+# Preserve the authoritative source export byte-for-byte (CRLF is part of its recorded hash).
+reference/source/risultati/metriche_repliche.csv -diff -text

@@ -1,0 +1,621 @@
+{
+  "schemaVersion": 1,
+  "provenance": {
+    "date": "2026-10-09",
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "sourceHashes": {
+      "simulatore_ascensori.py": "8b64d80804c086468adfbbd87f9d8c28bd0d7814bb5c31445a25e8338a279ad6",
+      "uffici_adattivi.py": "86ac2adde50a1646a5a87b5da55e593cd0e561ffa9ac0c707014875b341cbe86",
+      "rapporto_ascensori.tex": "953b06f197f0711c945207268457b4655a4785511e547b0f3ea7869293dc1a09"
+    },
+    "note": "Offline numeric references, no DES run or new engine. Fixed80 coverage is approved D6, not the archived engine."
+  },
+  "recommendedAbsoluteTolerances": {
+    "travelSeconds": 1e-10,
+    "normalCdf": 1e-9,
+    "normalQuantile": 0.000001,
+    "linearQuantile": 1e-12,
+    "studentQuantile": 0.000001,
+    "shrinkage": 1e-10,
+    "forecastCalls": 1e-7,
+    "coverageScore": 1e-9
+    ,"nnlsCoefficients": 1e-8
+    ,"nnlsPredicted": 1e-8
+    ,"fitScores": 1e-8
+  },
+  "originalInvariant": {
+    "nnlsGaussianCase": {
+      "id": "nnls-gaussian-active-boundary",
+      "xHour": [
+        7,
+        8,
+        9,
+        10
+      ],
+      "centersHour": [
+        8,
+        9
+      ],
+      "sigmasHour": [
+        0.5,
+        0.5
+      ],
+      "designColumnOrder": [
+        "intercept",
+        "gaussian-center-8",
+        "gaussian-center-9"
+      ],
+      "A": [
+        [
+          1,
+          0.1353352832366127,
+          0.00033546262790251185
+        ],
+        [
+          1,
+          1,
+          0.1353352832366127
+        ],
+        [
+          1,
+          0.1353352832366127,
+          1
+        ],
+        [
+          1,
+          0.00033546262790251185,
+          0.1353352832366127
+        ]
+      ],
+      "bTrainMeanRequestsPerMinute": [
+        2,
+        1,
+        4,
+        4
+      ],
+      "holdoutMeanRequestsPerMinute": [
+        2,
+        1,
+        4,
+        4
+      ],
+      "expectedCoefficients": [
+        2.1564043157256516,
+        0,
+        1.868112882813457
+      ],
+      "expectedPredictedRequestsPerMinute": [
+        2.1570309977825386,
+        2.409225901839176,
+        4.024517198539108,
+        2.409225901839176
+      ],
+      "expectedResidualL2": 2.131135777251794,
+      "expectedMaeRequestsPerMinute": 0.7953870490804117,
+      "expectedR2": 0.3271496739136879,
+      "scoreNote": "Holdout values deliberately equal b for a tiny numeric test; no empirical validation. MAE=mean(abs(test-pred)); R2=1-sum((test-pred)^2)/sum((test-mean(test))^2)."
+    },
+    "travel": [
+      {
+        "id": "original-travel-0-floors",
+        "fromFloor": 0,
+        "toFloor": 0,
+        "floorHeightM": 3.3,
+        "speedMps": 2.5,
+        "accelerationMps2": 1,
+        "expectedSeconds": 0
+      },
+      {
+        "id": "original-travel-1-floors",
+        "fromFloor": 0,
+        "toFloor": 1,
+        "floorHeightM": 3.3,
+        "speedMps": 2.5,
+        "accelerationMps2": 1,
+        "expectedSeconds": 3.63318042491699
+      },
+      {
+        "id": "original-travel-2-floors",
+        "fromFloor": 0,
+        "toFloor": 2,
+        "floorHeightM": 3.3,
+        "speedMps": 2.5,
+        "accelerationMps2": 1,
+        "expectedSeconds": 5.14
+      },
+      {
+        "id": "original-travel-15-floors",
+        "fromFloor": 0,
+        "toFloor": 15,
+        "floorHeightM": 3.3,
+        "speedMps": 2.5,
+        "accelerationMps2": 1,
+        "expectedSeconds": 22.3
+      },
+      {
+        "id": "triangle-boundary-6.24999999",
+        "fromFloor": 0,
+        "toFloor": 1,
+        "floorHeightM": 6.24999999,
+        "speedMps": 2.5,
+        "accelerationMps2": 1,
+        "expectedSeconds": 4.999999996
+      },
+      {
+        "id": "triangle-boundary-6.25",
+        "fromFloor": 0,
+        "toFloor": 1,
+        "floorHeightM": 6.25,
+        "speedMps": 2.5,
+        "accelerationMps2": 1,
+        "expectedSeconds": 5
+      },
+      {
+        "id": "triangle-boundary-6.25000001",
+        "fromFloor": 0,
+        "toFloor": 1,
+        "floorHeightM": 6.25000001,
+        "speedMps": 2.5,
+        "accelerationMps2": 1,
+        "expectedSeconds": 5.000000004
+      }
+    ],
+    "normalCdf": [
+      {
+        "z": -8,
+        "expected": 6.22096057427174e-16
+      },
+      {
+        "z": -3,
+        "expected": 0.0013498980316300933
+      },
+      {
+        "z": -1,
+        "expected": 0.15865525393145707
+      },
+      {
+        "z": 0,
+        "expected": 0.5
+      },
+      {
+        "z": 1,
+        "expected": 0.8413447460685429
+      },
+      {
+        "z": 3,
+        "expected": 0.9986501019683699
+      },
+      {
+        "z": 8,
+        "expected": 0.9999999999999993
+      }
+    ],
+    "normalQuantile": [
+      {
+        "probability": 0.001,
+        "expected": -3.090232306167813
+      },
+      {
+        "probability": 0.025,
+        "expected": -1.9599639845400545
+      },
+      {
+        "probability": 0.5,
+        "expected": 0
+      },
+      {
+        "probability": 0.975,
+        "expected": 1.959963984540054
+      },
+      {
+        "probability": 0.999,
+        "expected": 3.090232306167813
+      }
+    ],
+    "linearQuantile": [
+      {
+        "values": [
+          0,
+          10,
+          20,
+          30
+        ],
+        "probability": 0.5,
+        "method": "linear",
+        "expected": 15
+      },
+      {
+        "values": [
+          0,
+          10,
+          20,
+          30
+        ],
+        "probability": 0.9,
+        "method": "linear",
+        "expected": 27
+      },
+      {
+        "values": [
+          0,
+          10,
+          20,
+          30
+        ],
+        "probability": 0.95,
+        "method": "linear",
+        "expected": 28.499999999999996
+      },
+      {
+        "values": [
+          7
+        ],
+        "probability": 0.5,
+        "method": "linear",
+        "expected": 7
+      },
+      {
+        "values": [
+          7
+        ],
+        "probability": 0.9,
+        "method": "linear",
+        "expected": 7
+      },
+      {
+        "values": [
+          7
+        ],
+        "probability": 0.95,
+        "method": "linear",
+        "expected": 7
+      },
+      {
+        "values": [
+          1,
+          2,
+          2,
+          9,
+          10
+        ],
+        "probability": 0.5,
+        "method": "linear",
+        "expected": 2
+      },
+      {
+        "values": [
+          1,
+          2,
+          2,
+          9,
+          10
+        ],
+        "probability": 0.9,
+        "method": "linear",
+        "expected": 9.6
+      },
+      {
+        "values": [
+          1,
+          2,
+          2,
+          9,
+          10
+        ],
+        "probability": 0.95,
+        "method": "linear",
+        "expected": 9.8
+      }
+    ],
+    "studentQuantile": [
+      {
+        "degreesOfFreedom": 1,
+        "probability": 0.025,
+        "expected": -12.706204736174705
+      },
+      {
+        "degreesOfFreedom": 1,
+        "probability": 0.975,
+        "expected": 12.706204736174694
+      },
+      {
+        "degreesOfFreedom": 7,
+        "probability": 0.025,
+        "expected": -2.3646242515927844
+      },
+      {
+        "degreesOfFreedom": 7,
+        "probability": 0.975,
+        "expected": 2.364624251592784
+      },
+      {
+        "degreesOfFreedom": 30,
+        "probability": 0.025,
+        "expected": -2.042272456301238
+      },
+      {
+        "degreesOfFreedom": 30,
+        "probability": 0.975,
+        "expected": 2.0422724563012378
+      }
+    ],
+    "pairedStudentInterval": {
+      "differencesSeconds": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "meanSeconds": 2.5,
+      "sampleSdSeconds": 1.2909944487358056,
+      "degreesOfFreedom": 3,
+      "t975": 3.1824463052837078,
+      "halfWidthSeconds": 2.0542602567605206,
+      "ci95Seconds": [
+        0.4457397432394794,
+        4.554260256760521
+      ]
+    },
+    "shrinkage": {
+      "office": {
+        "id": "TINY",
+        "floor": 1,
+        "employees": 4,
+        "scheduledHour": 13,
+        "participationPrior": 0.5
+      },
+      "priorEvents": 2,
+      "priorWorkerDays": 2,
+      "priorSigmaMinutes": 6,
+      "trainingTimesHour": [
+        [
+          12.9,
+          13
+        ],
+        [
+          13.1,
+          13.2
+        ]
+      ],
+      "expectedModel": {
+        "id": "TINY",
+        "floor": 1,
+        "employees": 4,
+        "scheduled_hour": 13,
+        "estimated_hour": 13.033333333333333,
+        "estimated_sigma_hours": 0.12018504251546598,
+        "estimated_participation": 0.5,
+        "historical_lunch_calls": 4
+      },
+      "emptyTwoDayTrainingExpectedModel": {
+        "id": "TINY",
+        "floor": 1,
+        "employees": 4,
+        "scheduled_hour": 13,
+        "estimated_hour": 13,
+        "estimated_sigma_hours": 0.1,
+        "estimated_participation": 0.1,
+        "historical_lunch_calls": 0
+      }
+    },
+    "forecast": {
+      "model": {
+        "id": "TINY",
+        "floor": 1,
+        "employees": 4,
+        "estimated_hour": 13,
+        "estimated_sigma_hours": 0.1,
+        "estimated_participation": 0.5
+      },
+      "officeCases": [
+        {
+          "tHour": 12.85,
+          "leadMinutes": 3,
+          "horizonMinutes": 12,
+          "returning": false,
+          "lunchDurationMinutes": 60,
+          "windowStartHour": 12.9,
+          "windowEndHour": 13.1,
+          "expectedCalls": 1.3653789842741686
+        },
+        {
+          "tHour": 13.85,
+          "leadMinutes": 3,
+          "horizonMinutes": 12,
+          "returning": true,
+          "lunchDurationMinutes": 60,
+          "windowStartHour": 13.9,
+          "windowEndHour": 14.1,
+          "expectedCalls": 1.3653789842741686
+        }
+      ],
+      "floorCases": [
+        {
+          "nowSeconds": 46440,
+          "blockCenterSeconds": 46350,
+          "windowStartSeconds": 46530,
+          "windowEndSeconds": 47250,
+          "expectedByFloor": {
+            "0": 2.1335274691688093e-18,
+            "1": 1.3354457479125486
+          }
+        },
+        {
+          "nowSeconds": 46499,
+          "blockCenterSeconds": 46350,
+          "windowStartSeconds": 46530,
+          "windowEndSeconds": 47250,
+          "expectedByFloor": {
+            "0": 2.1335274691688093e-18,
+            "1": 1.3354457479125486
+          }
+        },
+        {
+          "nowSeconds": 50040,
+          "blockCenterSeconds": 49950,
+          "windowStartSeconds": 50130,
+          "windowEndSeconds": 50850,
+          "expectedByFloor": {
+            "0": 1.3354457479125486,
+            "1": 0
+          }
+        }
+      ],
+      "binExpectation": {
+        "edgesHour": [
+          12.9,
+          13,
+          13.1
+        ],
+        "expectedCounts": [
+          0.6826894921370842,
+          0.6826894921370843
+        ]
+      }
+    }
+  },
+  "approvedFixed80Extension": {
+    "massKg": 80,
+    "plannedLoadFraction": 0.96,
+    "coverageFraction": 0.82,
+    "scope": "one decision, one equivalent batch, not measured 12-minute throughput",
+    "capacityCases": [
+      {
+        "ratedLoadKg": 79.99,
+        "maxPeople": 13,
+        "expectedRealPeople": 0,
+        "expectedPlannedPeople": 0,
+        "expectedCoverageCalls": 0
+      },
+      {
+        "ratedLoadKg": 80,
+        "maxPeople": 1,
+        "expectedRealPeople": 1,
+        "expectedPlannedPeople": 0,
+        "expectedCoverageCalls": 0
+      },
+      {
+        "ratedLoadKg": 84,
+        "maxPeople": 1,
+        "expectedRealPeople": 1,
+        "expectedPlannedPeople": 1,
+        "expectedCoverageCalls": 0.82
+      },
+      {
+        "ratedLoadKg": 250,
+        "maxPeople": 3,
+        "expectedRealPeople": 3,
+        "expectedPlannedPeople": 3,
+        "expectedCoverageCalls": 2.46
+      },
+      {
+        "ratedLoadKg": 640,
+        "maxPeople": 10,
+        "expectedRealPeople": 8,
+        "expectedPlannedPeople": 7,
+        "expectedCoverageCalls": 5.739999999999999
+      },
+      {
+        "ratedLoadKg": 800,
+        "maxPeople": 10,
+        "expectedRealPeople": 10,
+        "expectedPlannedPeople": 9,
+        "expectedCoverageCalls": 7.38
+      },
+      {
+        "ratedLoadKg": 960,
+        "maxPeople": 13,
+        "expectedRealPeople": 12,
+        "expectedPlannedPeople": 11,
+        "expectedCoverageCalls": 9.02
+      },
+      {
+        "ratedLoadKg": 1000,
+        "maxPeople": 13,
+        "expectedRealPeople": 12,
+        "expectedPlannedPeople": 12,
+        "expectedCoverageCalls": 9.84
+      },
+      {
+        "ratedLoadKg": 1600,
+        "maxPeople": 5,
+        "expectedRealPeople": 5,
+        "expectedPlannedPeople": 5,
+        "expectedCoverageCalls": 4.1
+      }
+    ],
+    "coverageCases": [
+      {
+        "demandCalls": 0,
+        "coverageCalls": 9.84,
+        "expectedResidualCalls": 0,
+        "expectedGainScore": 0
+      },
+      {
+        "demandCalls": 0.5,
+        "coverageCalls": 0.82,
+        "expectedResidualCalls": 0,
+        "expectedGainScore": 12.613446228805717
+      },
+      {
+        "demandCalls": 12,
+        "coverageCalls": 0,
+        "expectedResidualCalls": 12,
+        "expectedGainScore": 0
+      },
+      {
+        "demandCalls": 12,
+        "coverageCalls": 5.74,
+        "expectedResidualCalls": 6.26,
+        "expectedGainScore": 200.3959675609821
+      },
+      {
+        "demandCalls": 12,
+        "coverageCalls": 9.84,
+        "expectedResidualCalls": 2.16,
+        "expectedGainScore": 317.7921595543656
+      },
+      {
+        "demandCalls": 12,
+        "coverageCalls": 15.58,
+        "expectedResidualCalls": 0,
+        "expectedGainScore": 360
+      },
+      {
+        "demandCalls": 12,
+        "coverageCalls": 19.68,
+        "expectedResidualCalls": 0,
+        "expectedGainScore": 360
+      },
+      {
+        "demandCalls": 20,
+        "coverageCalls": 9.84,
+        "expectedResidualCalls": 10.16,
+        "expectedGainScore": 342.67564625832887
+      },
+      {
+        "demandCalls": 20,
+        "coverageCalls": 15.58,
+        "expectedResidualCalls": 4.42,
+        "expectedGainScore": 509.08373360756974
+      }
+    ],
+    "marginalCase": {
+      "demandCalls": 12,
+      "existingCoverageCalls": 9.84,
+      "addedCoverageCalls": 5.74,
+      "travelSeconds": 0,
+      "distanceFloors": 0,
+      "expectedValue": 42.20784044563442
+    },
+    "homogeneousReduction": {
+      "perCarCoverageCalls": 9.84,
+      "assignedCars": 2,
+      "expectedCoverageCalls": 19.68,
+      "demandCalls": 12,
+      "expectedGainScore": 360
+    }
+  }
+}

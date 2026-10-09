@@ -1,0 +1,389 @@
+{
+  "config": {
+    "building": {
+      "upper_floors": 15,
+      "number_of_elevators": 4,
+      "employees_per_floor": 35,
+      "floor_height_m": 3.3,
+      "lobby_floor": 0
+    },
+    "elevators": {
+      "rated_load_kg": 1000,
+      "max_people": 13,
+      "speed_m_s": 2.5,
+      "acceleration_m_s2": 1.0,
+      "door_base_s": 5.5,
+      "passenger_transfer_s": 0.8,
+      "weight_mean_kg": 76,
+      "weight_sd_kg": 14,
+      "weight_min_kg": 48,
+      "weight_max_kg": 115,
+      "robust_reserved_kg_per_future_passenger": 87,
+      "optimized_max_planned_load_fraction": 0.96
+    },
+    "traffic": {
+      "office_start_hour": 8,
+      "office_end_hour": 19,
+      "arrival_mean_hour": 7.88,
+      "arrival_sd_minutes": 16,
+      "departure_mean_hour": 19.06,
+      "departure_sd_minutes": 17,
+      "lunch_duration_minutes": 60,
+      "lunch_participation": 0.72,
+      "lunch_start_hours": [
+        12,
+        13,
+        14
+      ],
+      "lunch_start_probabilities": [
+        0.35,
+        0.43,
+        0.22
+      ],
+      "lunch_sd_minutes": 9,
+      "internal_trips_probability_per_worker": 0.09,
+      "simulation_start_hour": 7.0,
+      "simulation_end_hour": 21.0
+    },
+    "experiment": {
+      "seeds": [
+        101,
+        202,
+        303,
+        404,
+        505,
+        606,
+        707,
+        808
+      ],
+      "fit_training_days": 6,
+      "arrival_histogram_minutes": 10,
+      "chart_bin_minutes": 30,
+      "fairness_threshold_seconds": 120,
+      "objective_ride_time_factor": 0.33,
+      "objective_late_wait_factor": 0.035,
+      "relocation_forecast_horizon_minutes": 12,
+      "relocation_idle_delay_seconds": 35
+    },
+    "offices": {
+      "number_of_offices": 30,
+      "total_employees": 525,
+      "definitions": [],
+      "focus_office": {
+        "id": "U12-FOCUS",
+        "floor": 12,
+        "employees": 65,
+        "lunch_start_hour": 13.0
+      },
+      "default_lunch_start_hours": [
+        12.0,
+        13.0,
+        14.0
+      ],
+      "habit_seed": 917,
+      "true_habit_sd_minutes": 9.0,
+      "daily_schedule_jitter_minutes": 2.5,
+      "shrinkage_prior_events": 22,
+      "participation_prior_worker_days": 12,
+      "training_day_seeds": [
+        1101,
+        1102,
+        1103,
+        1104,
+        1105,
+        1106,
+        1107,
+        1108,
+        1109,
+        1110,
+        1111,
+        1112
+      ],
+      "validation_day_seeds": [
+        2201,
+        2202,
+        2203,
+        2204
+      ],
+      "forecast_horizon_minutes": 12,
+      "preposition_lead_minutes": 3,
+      "reserve_idle_cars": 1,
+      "effective_capacity_fraction_per_horizon": 0.82,
+      "min_office_predicted_calls": 3.0,
+      "movement_penalty_per_second": 0.1,
+      "reserve_coverage_penalty": 0.1,
+      "max_grouped_cars_per_floor": 3,
+      "recompute_parking_delay_seconds": 35
+    }
+  },
+  "summary": {
+    "fifo": {
+      "count": {
+        "mean": 1849.125,
+        "std": 19.866968278311326
+      },
+      "unserved": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "served_pct": {
+        "mean": 100.0,
+        "std": 0.0
+      },
+      "mean_wait": {
+        "mean": 95.70653803325462,
+        "std": 31.28085580952861
+      },
+      "median_wait": {
+        "mean": 10.28098517539729,
+        "std": 0.4926549191903882
+      },
+      "p90_wait": {
+        "mean": 273.40279757794815,
+        "std": 219.63431098765545
+      },
+      "p95_wait": {
+        "mean": 517.7724400178435,
+        "std": 217.05906332970122
+      },
+      "wait_over_120_pct": {
+        "mean": 11.610041555460615,
+        "std": 2.687959367803097
+      },
+      "mean_ride": {
+        "mean": 112.42552898090162,
+        "std": 12.789490745259515
+      },
+      "mean_journey": {
+        "mean": 208.13206701415623,
+        "std": 37.48762346108738
+      },
+      "bypasses": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "distance_floors": {
+        "mean": 18539.5,
+        "std": 342.4028537931807
+      },
+      "park_floors": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "door_stops": {
+        "mean": 3058.5,
+        "std": 28.585710716070313
+      },
+      "adaptive_parking_decisions": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "max_grouped_same_floor": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    },
+    "optimal": {
+      "count": {
+        "mean": 1849.125,
+        "std": 19.866968278311326
+      },
+      "unserved": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "served_pct": {
+        "mean": 100.0,
+        "std": 0.0
+      },
+      "mean_wait": {
+        "mean": 11.22028860932134,
+        "std": 0.2477341987265012
+      },
+      "median_wait": {
+        "mean": 9.876170303582967,
+        "std": 0.5391909550064642
+      },
+      "p90_wait": {
+        "mean": 21.785176703140497,
+        "std": 0.5849167477705539
+      },
+      "p95_wait": {
+        "mean": 26.033163038742636,
+        "std": 0.9292941446789483
+      },
+      "wait_over_120_pct": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "mean_ride": {
+        "mean": 28.07106681092408,
+        "std": 0.38480097129900215
+      },
+      "mean_journey": {
+        "mean": 39.291355420245424,
+        "std": 0.447187977812879
+      },
+      "bypasses": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "distance_floors": {
+        "mean": 17765.0,
+        "std": 276.8372394437879
+      },
+      "park_floors": {
+        "mean": 1140.875,
+        "std": 113.25500619650961
+      },
+      "door_stops": {
+        "mean": 3006.375,
+        "std": 50.77383324958972
+      },
+      "adaptive_parking_decisions": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "max_grouped_same_floor": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    },
+    "adaptive": {
+      "count": {
+        "mean": 1849.125,
+        "std": 19.866968278311326
+      },
+      "unserved": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "served_pct": {
+        "mean": 100.0,
+        "std": 0.0
+      },
+      "mean_wait": {
+        "mean": 11.097961599424913,
+        "std": 0.2300135004873886
+      },
+      "median_wait": {
+        "mean": 9.376066289662958,
+        "std": 0.3401691620084669
+      },
+      "p90_wait": {
+        "mean": 21.709915883048232,
+        "std": 0.5229221669716435
+      },
+      "p95_wait": {
+        "mean": 25.95660554966236,
+        "std": 0.9359119529451861
+      },
+      "wait_over_120_pct": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "mean_ride": {
+        "mean": 28.119016449857185,
+        "std": 0.3825611073359138
+      },
+      "mean_journey": {
+        "mean": 39.21697804928209,
+        "std": 0.4556421553620927
+      },
+      "bypasses": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "distance_floors": {
+        "mean": 17880.5,
+        "std": 236.63292851406555
+      },
+      "park_floors": {
+        "mean": 1419.5,
+        "std": 154.09922591814478
+      },
+      "door_stops": {
+        "mean": 3007.0,
+        "std": 49.90848768353077
+      },
+      "adaptive_parking_decisions": {
+        "mean": 382.75,
+        "std": 41.743262929483606
+      },
+      "max_grouped_same_floor": {
+        "mean": 1.75,
+        "std": 0.4629100498862757
+      }
+    }
+  },
+  "effects": {
+    "paired_wait_reduction_s": 84.48624942393329,
+    "paired_ci95_s": [
+      58.37467669021157,
+      110.597822157655
+    ],
+    "relative_improvement_pct": 88.27636142744743
+  },
+  "fits": {
+    "up": {
+      "coef": [
+        0.16809400666543012,
+        12.647018950888153,
+        3.7628714629024516,
+        5.451679141593425,
+        3.1725233719185213
+      ],
+      "r2_test": 0.9610851645082549,
+      "mae_test": 0.3011382175643381,
+      "centers": [
+        7.88,
+        13.0,
+        14.0,
+        15.0
+      ],
+      "sigmas": [
+        0.26666666666666666,
+        0.15,
+        0.15,
+        0.15
+      ]
+    },
+    "down": {
+      "coef": [
+        0.15939511225486616,
+        3.760549333439267,
+        5.522741915580656,
+        3.187428892229235,
+        12.005965305349468
+      ],
+      "r2_test": 0.9603870878709775,
+      "mae_test": 0.2881962510015015,
+      "centers": [
+        12,
+        13,
+        14,
+        19.06
+      ],
+      "sigmas": [
+        0.15,
+        0.15,
+        0.15,
+        0.2833333333333333
+      ]
+    }
+  },
+  "office_learning": {
+    "train_days": 12,
+    "holdout_days": 4,
+    "mae_office_5min_schedule": 0.2658641925325042,
+    "mae_office_5min_learned": 0.19734675556207346,
+    "focus_office_id": "U12-FOCUS",
+    "focus_true_habit_hour": 13.179553878840435,
+    "focus_learned_hour": 13.196241258980468,
+    "focus_scheduled_hour": 13.0,
+    "max_predicted_grouped_focus": 2,
+    "office_count": 30,
+    "total_employees": 525,
+    "focus_floor": 12
+  }
+}
