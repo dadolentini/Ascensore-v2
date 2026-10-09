@@ -29,9 +29,25 @@ Elevator è predisposto per GitHub Pages all’indirizzo `https://dadolentini.gi
 
 Il workflow **Pubblica Elevator** si avvia manualmente da **Actions → Pubblica Elevator → Run workflow**, scegliendo `main`. Esegue installazione, test e build prima del deployment. I normali push non pubblicano automaticamente nuove versioni.
 
-Per Pages, **Settings → Pages → Source** deve essere **GitHub Actions**. Il build usa `VITE_BASE_PATH=/Ascensore-v2/`; sviluppo e preview alla radice mantengono la base `/`. Il build produce anche ingressi HTML per `come-funziona/` e `gli-algoritmi/`, così i link diretti e il refresh funzionano sul server statico. Immagini, font, PDF e Web Worker rispettano lo stesso prefisso.
+Per Pages, **Settings → Pages → Source** deve essere **GitHub Actions**. Il workflow ricava `VITE_BASE_PATH` dall’output `base_path` di `actions/configure-pages`: `/Ascensore-v2/` per l’indirizzo GitHub e `/` quando Pages usa un dominio personalizzato. Sviluppo e preview alla radice mantengono la base `/`. Il build produce anche ingressi HTML per `come-funziona/` e `gli-algoritmi/`, così i link diretti e il refresh funzionano sul server statico. Immagini, font, PDF e Web Worker rispettano lo stesso prefisso.
 
 `npm run test:deployment` verifica il sito pubblico con Chromium: link diretti e refresh, PDF originale, risorse, due simulazioni senza reload, esempio interattivo, navigazione e download. È possibile passare un altro indirizzo dopo `--` per verificare prima un server statico locale. Richiede il browser Playwright già installato.
+
+### Dominio personalizzato
+
+L’utente ha richiesto `davidelentini.it` il 9 ottobre 2026. Per collegarlo, sostituire il record A del dominio principale nel pannello DNS Aruba con questi quattro record, preservando i record MX, TXT e quelli dei servizi di posta:
+
+| Tipo | Nome | Valore |
+|---|---|---|
+| A | @ | 185.199.108.153 |
+| A | @ | 185.199.109.153 |
+| A | @ | 185.199.110.153 |
+| A | @ | 185.199.111.153 |
+| CNAME | www | dadolentini.github.io |
+
+Impostare **Settings → Pages → Custom domain** su `davidelentini.it`, avviare **Pubblica Elevator** su `main` e abilitare **Enforce HTTPS** quando il certificato è disponibile. L’attivazione effettiva dipende dalla configurazione DNS e del dominio in Pages, non dal solo push di questo file.
+
+Verificare l’indirizzo definitivo con `npm run test:deployment -- https://davidelentini.it/`.
 
 ## Uso
 
