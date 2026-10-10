@@ -1,9 +1,10 @@
 import type { PolicyId, PolicyResult, RequestOutcome } from '../../model/contracts';
 import { mean } from '../../model/numerics';
 
-export const POLICY_NAMES:Record<PolicyId,string> = {fifo:'Gestione di base',optimal:'Ottimizzazione delle chiamate',adaptive:'Sistema adattivo'};
+export { POLICY_NAMES } from '../../content/model';
 export const POLICY_COLORS:Record<PolicyId,string> = {fifo:'#25637D',optimal:'#73569C',adaptive:'#32685A'};
 export const seconds = (value:number|null) => value === null ? 'Non disponibile' : `${new Intl.NumberFormat('it-IT',{maximumFractionDigits:1}).format(value)} s`;
+export const secondsDifference = (value:number) => value>0&&value<.1?'meno di 0,1 s':seconds(value);
 export function aggregatePolicies(results:readonly PolicyResult[]) {
   return (['fifo','optimal','adaptive'] as const).filter(policy=>results.some(r=>r.policy===policy)).map(policy=>{
     const rows=results.filter(r=>r.policy===policy);

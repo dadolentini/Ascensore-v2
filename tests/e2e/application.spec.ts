@@ -9,8 +9,8 @@ async function configureSmall(page:Page,navigate=true) {
   await page.getByLabel('Uffici per piano',{exact:true}).fill('1');
   await page.getByLabel('Persone per ufficio',{exact:true}).fill('2');
   await page.getByRole('button',{name:'Distribuisci gli uffici',exact:true}).click();
-  await page.getByText('Confronto e riproducibilità',{exact:true}).click();
-  await page.getByLabel('Numero di repliche',{exact:true}).fill('1');
+  await page.getByText('Giornate e impostazioni del confronto',{exact:true}).click();
+  await page.getByLabel('Giornate da confrontare',{exact:true}).fill('1');
 }
 async function run(page:Page) {
   await page.getByRole('button',{name:'Esegui il confronto',exact:false}).click();
@@ -113,9 +113,9 @@ test('punti del grafico e confronto base/adattivo corrispondono ai risultati esp
     const base=baseline.kpis[key]!,value=adaptive.kpis[key]!,delta=base-value;
     await expect(rows.nth(index).locator('td').nth(0)).toHaveText(`${format(base)} s`);
     await expect(rows.nth(index).locator('td').nth(1)).toHaveText(`${format(value)} s`);
-    await expect(rows.nth(index).locator('td').nth(2)).toContainText(delta===0?'Nessuna differenza':`${format(Math.abs(delta))} s ${delta>0?'in meno':'in più'}`);
+    await expect(rows.nth(index).locator('td').nth(2)).toContainText(delta===0?'Nessuna differenza':`${Math.abs(delta)<.1?'meno di 0,1 s':format(Math.abs(delta))+' s'} ${delta>0?'in meno':'in più'}`);
   }
-  const graph=page.getByRole('img',{name:'Distribuzione cumulata dei tempi d’attesa',exact:false});
+  const graph=page.getByRole('img',{name:'Percentuale dei viaggi conclusi con attesa entro il tempo indicato',exact:false});
   await graph.scrollIntoViewIfNeeded();const box=(await graph.boundingBox())!;
   await page.mouse.move(box.x+box.width*.52,box.y+box.height*.55);
   const readout=page.locator('.cdf-point-readout');await expect(readout).toHaveAttribute('data-wait-seconds',/.+/);
@@ -141,7 +141,7 @@ test('quattro simulazioni consecutive senza reload, con nuovi input e bozza cons
   await run(page);expect(await page.locator('.dataset-hashes li').first().textContent()).toBe(firstHash);
   await page.getByLabel('Persone per ufficio',{exact:true}).fill('3');await page.getByRole('button',{name:'Distribuisci gli uffici',exact:true}).click();await run(page);
   expect(await page.locator('.dataset-hashes li').first().textContent()).not.toBe(firstHash);
-  await page.getByLabel('Numero di repliche',{exact:true}).fill('2');await run(page);await expect(page.locator('.dataset-hashes li')).toHaveCount(2);
+  await page.getByLabel('Giornate da confrontare',{exact:true}).fill('2');await run(page);await expect(page.locator('.dataset-hashes li')).toHaveCount(2);
   await page.getByRole('navigation',{name:'Navigazione principale'}).getByRole('link',{name:'Come funziona',exact:true}).click();
   await page.getByRole('navigation',{name:'Navigazione principale'}).getByRole('link',{name:'Simulatore',exact:true}).click();
   await expect(page.getByLabel('Numero di ascensori',{exact:true})).toHaveValue('1');await expect(page.locator('.result-card')).toHaveCount(3);
@@ -178,7 +178,7 @@ test('accessibilità automatica delle tre pagine e dei grafici calcolati',async(
   for(const path of ['/','/gli-algoritmi','/come-funziona','/#simulatore']) {
     await page.goto(path);await expect(page.getByRole('heading',{level:1})).toBeVisible();
     if(path==='/come-funziona'){await page.getByRole('button',{name:'Osserva l’automazione',exact:false}).click();await expect(page.getByText('3 di 3 persone arrivate a destinazione.',{exact:true})).toBeVisible();}
-    if(path==='/#simulatore'){await configureSmall(page,false);await run(page);await page.getByText('Tempi, fermate e richieste della replica',{exact:true}).click();await page.getByRole('slider',{name:'Attesa da esplorare',exact:true}).focus();await page.keyboard.press('End');}
+    if(path==='/#simulatore'){await configureSmall(page,false);await run(page);await page.getByText('Tempi, fermate e chiamate di questa giornata',{exact:true}).click();await page.getByRole('slider',{name:'Attesa da esplorare',exact:true}).focus();await page.keyboard.press('End');}
     const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
     expect(result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
   }
