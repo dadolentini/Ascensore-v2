@@ -17,6 +17,7 @@ export default function Results({experiment,previous}:{experiment:ExperimentResu
   const policy=summaries.some(s=>s.policy===selectedPolicy)?selectedPolicy:summaries[0]?.policy;
   const chosen=experiment.results.find(r=>r.seed===day?.seed&&r.policy===policy);
   const traced=experiment.results.find(r=>r.trace!==null);
+  const recordingIssue=experiment.diagnosticsIssues.find(issue=>issue.code==='trace-unavailable');
   const tracedDay=traced?experiment.datasets.findIndex(d=>d.seed===traced.seed)+1:0;
   const comparisonMetrics=[{key:'meanWaitS',label:'Attesa prima di salire'},{key:'meanRideS',label:'Viaggio in cabina'},{key:'meanJourneyS',label:'Tempo totale (attesa + viaggio)'}] as const;
   function difference(base:number|null,value:number|null) {
@@ -32,7 +33,8 @@ export default function Results({experiment,previous}:{experiment:ExperimentResu
   });
   return <section id="risultati" className="simulation-results" aria-labelledby="results-title">
     <div className="result-heading"><div><p className="eyebrow">07 / {previous?'Confronto precedente':'Risultati calcolati'}</p><h2 id="results-title">Quanto si aspetta.<br/><em>Che cosa cambia.</em></h2></div><div className="result-downloads"><button type="button" className="quiet-button" onClick={()=>downloadJson(experiment,'ascensori-scenario-risultati.json')}>Dati completi JSON ↗︎</button><button type="button" className="quiet-button" onClick={()=>downloadCsv(experiment.results)}>Metriche CSV ↗︎</button></div></div>
-    {previous&&<p className="previous-notice" role="status">La configurazione è cambiata. Questi risultati appartengono al confronto precedente: premi “Esegui il confronto” per aggiornarli.</p>}
+    {previous&&<p className="previous-notice">Questi risultati appartengono al confronto precedente, l’ultimo completato. Premi “Esegui il confronto” per calcolare nuovi risultati.</p>}
+    {recordingIssue&&<div className="trace-unavailable-notice draft-warning" role="status"><p>Tutti i risultati {previous?'del confronto precedente':'del confronto'} sono stati calcolati. La registrazione dei movimenti richiesta non è disponibile.</p><p>{recordingIssue.message}</p></div>}
     <p>{experiment.scenario.cabins.length} ascensori · {experiment.scenario.upperFloors} piani sopra terra + piano terra · {experiment.scenario.offices.reduce((s,o)=>s+o.employees,0)} persone · {experiment.datasets.length} {experiment.datasets.length===1?'giornata simulata':'giornate simulate'}.</p>
     <p className="chart-note">Confrontiamo tre modi di organizzare gli stessi ascensori. Le persone fanno le stesse chiamate: cambia come vengono servite e dove aspettano le cabine libere.</p>
     <div className="summary-grid">{summaries.map(s=><article className="result-card" key={s.policy}>

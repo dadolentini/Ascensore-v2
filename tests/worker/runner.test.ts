@@ -1,10 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Dataset, OdRequest, ScenarioV2 } from '../../src/model/contracts';
+import * as engine from '../../src/engine';
+import { SimulationError } from '../../src/engine';
 import { createDefaultScenario } from '../../src/model/defaults';
 import { hashValue } from '../../src/model/reproducibility';
 import { generateDataset } from '../../src/model/demand';
 import { fitFlow } from '../../src/model/flowFit';
 import { runExperiment, runExplanation } from '../../src/worker/runner';
+
+afterEach(() => vi.restoreAllMocks());
 
 function smallScenario(): ScenarioV2 {
   const s = createDefaultScenario();
@@ -86,5 +90,73 @@ describe('small explanatory trace', () => {
       await expect(runExplanation(s, await customDataset([r as OdRequest]))).rejects.toMatchObject({ kind: 'invalid' });
     }
     await expect(runExplanation(s, await customDataset(Array.from({ length: 5 }, (_, id) => ({ ...request, id }))))).rejects.toMatchObject({ kind: 'unsupported' });
+  });
+});
+
+describe('selected recording memory budget', () => {
+  it('recalculates only the selected run without recording and preserves the complete experiment', async () => {
+    const s = smallScenario();
+    const policies = ['fifo', 'optimal', 'adaptive'] as const;
+    const baseline = await runExperiment(s, policies, null);
+    const original = engine.simulate;
+    const calls = vi.spyOn(engine, 'simulate').mockImplementation((...args) => {
+      const result = original(...args);
+      if (args[4]) throw new SimulationError('unsupported', 'resource-trace', 'Trace memory limit exceeded', 'trace');
+      return result;
+    });
+    const progress: unknown[] = [];
+    const recovered = await runExperiment(s, policies, { policy: 'optimal', seed: '2' }, update => progress.push(update));
+
+    expect(calls).toHaveBeenCalledTimes(7);
+    const tracedIndex = calls.mock.calls.findIndex(args => args[4]);
+    expect(tracedIndex).toBe(4);
+    const recorded = calls.mock.calls[tracedIndex], repeated = calls.mock.calls[tracedIndex + 1];
+    for (let index = 0; index < 4; index++) expect(repeated[index]).toBe(recorded[index]);
+    expect(repeated[4]).toBe(false);
+    expect(recovered.results).toStrictEqual(baseline.results);
+    expect(recovered.datasets).toStrictEqual(baseline.datasets);
+    expect(recovered.results.every(result => result.trace === null && result.initialSnapshot === null)).toBe(true);
+    expect(recovered).toStrictEqual({ ...baseline, diagnosticsIssues: [...baseline.diagnosticsIssues, expect.objectContaining({ code: 'trace-unavailable', path: 'results.optimal.2.trace', details: { policy: 'optimal', seed: '2', reason: 'resource-trace' } })] });
+    expect(progress).toEqual(expect.arrayContaining([expect.objectContaining({ phase: 'simulation', completedRuns: 4, totalRuns: 6, policy: 'optimal', seed: '2', recordingUnavailable: true, processedEvents: 0, simulationTimeS: s.startS })]));
+    expect(progress.at(-1)).toMatchObject({ completedRuns: 6, totalRuns: 6 });
+  });
+
+  it.each([
+    { name: 'event budget', error: new SimulationError('unsupported', 'resource-events', 'Event limit exceeded') },
+    { name: 'invalid input', error: new SimulationError('invalid', 'resource-trace', 'Invalid trace input') },
+    { name: 'numerical failure', error: new SimulationError('numerical', 'resource-trace', 'Numerical failure') },
+    { name: 'internal failure', error: new Error('Internal failure') },
+    { name: 'untyped trace error', error: { kind: 'unsupported', issues: [{ code: 'resource-trace' }] } },
+  ])('propagates $name without retrying or returning partial results', async ({ error }) => {
+    const calls = vi.spyOn(engine, 'simulate').mockImplementation(() => { throw error; });
+    await expect(runExperiment(smallScenario(), ['fifo'], { policy: 'fifo', seed: '1' })).rejects.toBe(error);
+    expect(calls).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not retry a trace budget error when recording was not requested for that run', async () => {
+    const error = new SimulationError('unsupported', 'resource-trace', 'Unexpected trace failure', 'trace');
+    const calls = vi.spyOn(engine, 'simulate').mockImplementation(() => { throw error; });
+    await expect(runExperiment(smallScenario(), ['fifo', 'optimal'], { policy: 'optimal', seed: '2' })).rejects.toBe(error);
+    expect(calls).toHaveBeenCalledTimes(1);
+    expect(calls.mock.calls[0][4]).toBe(false);
+  });
+
+  it('recovers the real recording limit for thirty floors and eighteen hundred people', async () => {
+    const s = createDefaultScenario();
+    s.upperFloors = 30;
+    s.offices = Array.from({ length: 90 }, (_, index) => ({ id: `U${index + 1}`, floor: Math.floor(index / 3) + 1, employees: 20, lunchStartHour: [12, 13, 14][index % 3], lunchParticipation: 1 }));
+    s.seeds.simulation = ['101'];
+    s.fitTrainingDays = 1;
+    const baseline = await runExperiment(s, ['adaptive'], null);
+    const recovered = await runExperiment(s, ['adaptive'], { policy: 'adaptive', seed: '101' });
+    expect(recovered.results).toStrictEqual(baseline.results);
+    expect(recovered.datasets).toStrictEqual(baseline.datasets);
+    expect(recovered.results).toHaveLength(1);
+    const result = recovered.results[0];
+    expect(result.trace).toBeNull();
+    expect(result.initialSnapshot).toBeNull();
+    expect(result.kpis.generated).toBe(result.kpis.completed + result.kpis.waiting + result.kpis.onboard);
+    expect(result.outcomes).toHaveLength(recovered.datasets[0].requests.length);
+    expect(recovered.diagnosticsIssues).toEqual(expect.arrayContaining([expect.objectContaining({ code: 'trace-unavailable', details: { policy: 'adaptive', seed: '101', reason: 'resource-trace' } })]));
   });
 });

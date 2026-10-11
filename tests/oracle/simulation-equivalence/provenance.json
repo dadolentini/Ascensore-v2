@@ -1,0 +1,224 @@
+{
+  "purpose": "Exact regression oracle for optimization of the approved fixed80 V2 engine. This is the unmodified V2 engine, not the historical variable-weight Python.",
+  "generatedAt": "2026-10-11T19:44:13.904Z",
+  "snapshotRoot": "/tmp/elevator-before-fix/src",
+  "snapshotReason": "Immutable source snapshot copied by the coordinating agent before optimization edits.",
+  "originalGitHead": "acb2500acc7132bbff834d4004306abc769822bf",
+  "nodeVersion": "v24.19.0",
+  "rolldownVersion": "1.2.13",
+  "dependencyLockSha256": "6937d1778c8a850d5d4c2f48774c339e4ea27c2c923c1ba066bb444cf81d9f54",
+  "originalSourceFiles": {
+    "App.tsx": "127c54ad9806de2ad947252634cc999917ae28c5159c277e91945710c9d661c6",
+    "app/RunController.ts": "82e20c5278471d4732c0ac58b83ddf2e58f86141d89073c5a5e8e6f949c3f8b3",
+    "components/BuildingDiagram.tsx": "f3511234fb4aaf77bead3ccc3e6f7030426534891dcf087905428781b2dce981",
+    "components/Equation.tsx": "3fd08742302e5d5cbeb830474b390c33b097932eda980d7a824cf6adb15f62e6",
+    "components/RouteLink.tsx": "1dcd3d7ecd06b7b176f9ca732f2f9b75b456f005d6ff274921908769c30787c5",
+    "content/model.ts": "5d455301291b56f43876916f21298837927ba117d7738b9eb7bb35968da2a770",
+    "engine/errors.ts": "8ce8a15c86aad550b58f29ccb35773eaf36e9db4e3da8890f14602124f845733",
+    "engine/heap.ts": "9e92a52c84450107246026b84c86a91918f9a7f4865e933bc41ac4586ba0956e",
+    "engine/index.ts": "5fe7d52bf47a66d3c07a9cafd080a1af4fb80629aec4728b7834fe6be9254f65",
+    "engine/parking.ts": "7235c2eb0a24eb07b72299376242405e705ee226eb2b72d47693217f70f60b84",
+    "engine/routing.ts": "a71776d61d7fad0afad8c3f630c65cfbba91dc70e0fe88eb6f4411070580227f",
+    "engine/simulator.ts": "4331fe08288d08f803e9ef2d396e7f98afd61e5098ae41d6f886e35b0e11681c",
+    "features/AutomationExample.tsx": "23002473bac32d7c58a79d527d8bb1e8101b258a65383d8258a8397c94d3805c",
+    "features/Simulator.tsx": "5a9a75af16314ccb53da9e9a920b296a115e954455df0cc2e42734ffe5612d67",
+    "features/replay/Replay.tsx": "438e12b33b81ffe7fd3d93d522348136d1f0da6ea6a351427526327f1429d335",
+    "features/replay/state.ts": "485c627ea0aa9d46c8f40a30adc9e640766f8be737cbe2a641e67c60449a21cc",
+    "features/results/Charts.tsx": "f6983f3f27a60c780ed8bcc3f7471daf1ce8b5e013e9bf33316252208d20dccc",
+    "features/results/Results.tsx": "736f8fed8a5d5a8c2d12e5ef0b6e13ad4455ccf4286700cf121f0cc64421a94c",
+    "features/results/cdf.ts": "9065cbc10639770f886437cc99c918706606e45ed7fe156dc3ad288bd2a0abfa",
+    "features/results/data.ts": "0c1e1e986c7b65ba87dbc21c6e96e067bba0519b962d3fa42161e10f2553dbd0",
+    "features/useLandingMotion.ts": "ba56eab627f6145db23eaa67c089bb9f0a1d783963340bb46dd9d132d618c4fd",
+    "features/useSimulationJob.ts": "171056a051e11ef158f198fdeb8982d79ba343fd2d4a337bc6675abe80fb7f12",
+    "main.tsx": "f500466d9c0127db467cca72d0b27b9ff7ef596b63fe906651a9f2b9c4a92290",
+    "model/contracts.ts": "62710895f6407bdf52e80479bdcec7240aa428a9a9e977c9e67cabc96046f35c",
+    "model/defaults.ts": "33e7969d47a2442bc7a7cab36495522aab473c67f44286fbbcf83351565ac4c3",
+    "model/demand.ts": "c9e383815c78240f8fecb0c5a3457a803b595317e9b60feec224d7f448cb2803",
+    "model/flowFit.ts": "0750a638536a3800a00dc1aa98e3d024b4c538da09246ea70f66c40a547f2693",
+    "model/jstat.d.ts": "e5aca905f7898dee14fc9a39f8d3a5e22b8bfc6a2c9d596c273a6d207ebe3dc9",
+    "model/numerics.ts": "1f8797f0afe38c153b646c60b22a7de560b7681f1b1ce0a619079615c3bee251",
+    "model/officeModel.ts": "24ba4958c7ec07c62bea251d2f17890e6839d7bff71d2bc09afe668446912a31",
+    "model/physics.ts": "bb55104001a2f884f9293ffdc7aff81489d7f549b452990a34341b5c5ae6e245",
+    "model/reproducibility.ts": "df7e00d5969d2ad775db1b540b637a7910d9074c1819ecfe0468b98eec52dc8b",
+    "model/validate.ts": "6b051505c9d869c2b030ac65675018364a15d791956f8762a149c804512e6356",
+    "navigation/paths.ts": "7439d53f88346099b52ce79e8c32ec4fc82aca5fc89566f598740ffc2e10ee88",
+    "pages/Algorithms.tsx": "5cee801fd0e06e9b8f57ec4a3b28abcd8514cbc6ede1359d234c95cb8a6b5781",
+    "pages/HowItWorks.tsx": "45374be2332f387e6c98b2eb8e3164e44c68ae77afc0f1c3c917e68a9f4b31f7",
+    "pages/Landing.tsx": "a851cabdc0b4358cde125d34aad92c6fb69467d8195908faffb91690fde55a39",
+    "styles/base.css": "620e0a3f6b0109137f2c14c30029ae704b5503452523c9786e0872057b2cd42f",
+    "styles/building-diagram.css": "5a2cd97b60bb33aa0f3080e5d92cb56ae5736308062ab667ad52e0f4c7956002",
+    "styles/landing-motion.css": "bd15ad4a92add54e4fc4fa743c4956ba98afcf5a4a60aa03241b4fe402d89324",
+    "styles/simulator.css": "f95bcbeed1b07692266789cf5f424d7e515b332cc6a668384b9a2cb05778d808",
+    "worker/protocol.ts": "4dcf7e305a7def9e32ac5599946a2abc1f14d5594606563aaa165fd29226f587",
+    "worker/runner.ts": "1dbb1056ebc29a60c09c255bec042db99eeb847679db8691ee72117cb220a68e",
+    "worker/simulation.worker.ts": "e74e9e3f8839aa3724215e3e8d547e9485a8ef69c6ec8400fea4ca3012126bd0"
+  },
+  "originalSourceManifestSha256": "b1fa4a43ed52b1911972254c6b29b9d82b767f03f05774b1631fab94d4cdabde",
+  "originalBundleSha256": "bc458cc0097f8cf105a151110bb939906e871070270266eb1dbe9645fe36d78b",
+  "generatorScriptSha256": "422b9ec864a5e9ab82fc4504e103e253dc9b5a5a93e8727be536945513de219a",
+  "bundleScriptSha256": "46a315fe7e6c3ade53e82bdc042f9f8abdb5a70163f6191ed05de788ecc05ef2",
+  "compressedPayloadSha256": "50d6634c78345ab0d86d2bb8dfd5518f6bfbcf39bdf7f9b1bfd8ce6b6f7fc678",
+  "decompressedPayloadSha256": "c9f1f81f52b8c0588bc3ba55d406d340225baf508d4445835bcd1519f84537fd",
+  "decompressedBytes": 20592431,
+  "compressedBytes": 1262373,
+  "fixtureCount": 11,
+  "resultCount": 33,
+  "corpus": [
+    {
+      "name": "queued-1car-1floor",
+      "cabins": 1,
+      "upperFloors": 1,
+      "requests": 36,
+      "datasetHash": "0f4b6f55e275eb9457a1799255663e44583a937914447db25acad1d669ef8d64",
+      "coverage": [
+        "queued",
+        "simultaneous births",
+        "finite horizon",
+        "1 cabin",
+        "1 floor"
+      ]
+    },
+    {
+      "name": "queued-1car-50floors",
+      "cabins": 1,
+      "upperFloors": 50,
+      "requests": 42,
+      "datasetHash": "e16556ffe21ded0ca070fb7f743fe74ab50c2fa023d4faf0c7c596074ba3981e",
+      "coverage": [
+        "queued",
+        "50 floors",
+        "1 cabin",
+        "finite horizon"
+      ]
+    },
+    {
+      "name": "queued-8cars-1floor-heterogeneous",
+      "cabins": 8,
+      "upperFloors": 1,
+      "requests": 128,
+      "datasetHash": "ee69b32a8bdc8cc97ab87074caaf3ef0fe1f180960f309a15941fe01c53f4a6f",
+      "coverage": [
+        "queued",
+        "8 cabins",
+        "1 floor",
+        "heterogeneous capacities",
+        "zero planned cabin",
+        "unsorted cabin IDs",
+        "equal scores"
+      ]
+    },
+    {
+      "name": "queued-8cars-50floors-heterogeneous",
+      "cabins": 8,
+      "upperFloors": 50,
+      "requests": 128,
+      "datasetHash": "9cba13f4f5da59d0b717ce3ae53e8ac21f3bf457be95f4f0ac40b8df4f5580b9",
+      "coverage": [
+        "queued",
+        "8 cabins",
+        "50 floors",
+        "heterogeneous capacities",
+        "zero planned cabin",
+        "finite horizon"
+      ]
+    },
+    {
+      "name": "all-zero-planned-capacity",
+      "cabins": 2,
+      "upperFloors": 3,
+      "requests": 20,
+      "datasetHash": "94a67cd8dc1fcc7d2f535843404b063fc6524b7723663031eb8d06c49ff1b697",
+      "coverage": [
+        "zero planned fleet",
+        "physical capacity one",
+        "unserved",
+        "null completed-only metrics"
+      ]
+    },
+    {
+      "name": "event-ties-and-exact-horizon",
+      "cabins": 1,
+      "upperFloors": 1,
+      "requests": 5,
+      "datasetHash": "e89c46621cc3ba1d7eb1b4273dc9313ba7e55b0bd00bd5944418818c6a3e6abf",
+      "coverage": [
+        "NEW at DOOR",
+        "NEW at ARRIVE",
+        "NEW at horizon",
+        "insertion counter",
+        "no drain"
+      ]
+    },
+    {
+      "name": "parking-followed-by-queued-real-demand",
+      "cabins": 8,
+      "upperFloors": 50,
+      "requests": 120,
+      "datasetHash": "87561ca7a26969689f9466726471e7282d9d1919281c567a8b85a494758c3854",
+      "coverage": [
+        "adaptive positive demand",
+        "mature parking",
+        "real requests while parking moving",
+        "8 cabins",
+        "50 floors",
+        "retry signature"
+      ]
+    },
+    {
+      "name": "generated-lunch-72-seed-101",
+      "cabins": 4,
+      "upperFloors": 7,
+      "requests": 176,
+      "datasetHash": "a90b8eb86eb856817d2a846f9483d759341ce02748454ff52a42e9f0aa35c1ed",
+      "coverage": [
+        "original seeded generator",
+        "100 versus 72 percent participation",
+        "independent training",
+        "clustered demand",
+        "heterogeneous capacities"
+      ]
+    },
+    {
+      "name": "generated-lunch-72-seed-202",
+      "cabins": 4,
+      "upperFloors": 7,
+      "requests": 180,
+      "datasetHash": "ab5d8af9203d54e93c849f51002f9f8837cabb652ea5ef5be84a70954f7210ad",
+      "coverage": [
+        "original seeded generator",
+        "100 versus 72 percent participation",
+        "independent training",
+        "clustered demand",
+        "heterogeneous capacities"
+      ]
+    },
+    {
+      "name": "generated-lunch-100-seed-101",
+      "cabins": 4,
+      "upperFloors": 7,
+      "requests": 203,
+      "datasetHash": "7913142f697c27d17480f3e91a7d83b809de4c1c1cf10dea0b5639e43956588e",
+      "coverage": [
+        "original seeded generator",
+        "100 versus 72 percent participation",
+        "independent training",
+        "clustered demand",
+        "heterogeneous capacities"
+      ]
+    },
+    {
+      "name": "generated-lunch-100-seed-202",
+      "cabins": 4,
+      "upperFloors": 7,
+      "requests": 199,
+      "datasetHash": "2d101e33a4d9ddffa45043806ccbba48b6ccb031e3dfb82a15a493162961c33f",
+      "coverage": [
+        "original seeded generator",
+        "100 versus 72 percent participation",
+        "independent training",
+        "clustered demand",
+        "heterogeneous capacities"
+      ]
+    }
+  ]
+}

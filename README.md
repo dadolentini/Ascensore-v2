@@ -23,6 +23,15 @@ npm run build
 
 `build` comprende il controllo TypeScript. `.npmrc` usa una cache locale scrivibile. Il browser Playwright è una risorsa di test, non una dipendenza scaricata dagli utenti del sito.
 
+Per verificare anche con WebKit, il motore di Safari, su Mac:
+
+```bash
+npx playwright install webkit
+npx playwright test --config playwright.webkit.config.ts
+```
+
+La prova da 30 piani e 1.800 persone esegue tutte le otto giornate iniziali e può richiedere alcuni minuti. Il limite del test non è una durata promessa del prodotto.
+
 ## Pubblicazione
 
 L’indirizzo di pubblicazione richiesto per Elevator è `https://davidelentini.it/elevator/`. La pubblicazione e lo spostamento sotto questo percorso sono stati autorizzati dall’utente il 9 ottobre 2026. Il dominio principale reindirizza a `/elevator/`, conservando query e frammento; i vecchi link a «Come funziona» e «Gli algoritmi» reindirizzano alle nuove pagine. I link precedenti ai documenti matematici restano disponibili.
@@ -55,6 +64,7 @@ Verificare l’indirizzo definitivo con `npm run test:deployment`. Per una verif
 - La partecipazione al pranzo parte dal **100%** per gli uffici iniziali, aggiunti o ricreati; rimane modificabile per ogni ufficio. Le configurazioni importate conservano le percentuali salvate. **Scarica configurazione** salva un file sul dispositivo; **Importa configurazione** riapre quel file.
 - Le opzioni avanzate espongono uffici individuali, pause, portata/posti per cabina, caratteristiche fisiche, orari e repliche.
 - Esegui, modifica e riesegui senza reload. Puoi annullare e ripartire. Il worker viene terminato e sostituito a ogni run; i risultati precedenti rimangono identificati fino alla nuova conclusione. Navigare nelle altre pagine conserva bozza e risultati del simulatore.
+- Durante il calcolo sono visibili giornata, organizzazione, orario simulato ed eventi elaborati. Un tentativo con configurazione non valida viene distinto dall’ultimo confronto completato; gli uffici personalizzati restano conservati.
 - **Come funziona** calcola un caso controllato con lo stesso motore, timeline per persona, carico in kg, decisioni e replay. **Gli algoritmi** conduce a formule, unità, limiti e collegamenti al codice.
 - Esporta configurazione, risultati completi JSON o KPI CSV. Seed, versione del generatore e SHA-256 del dataset rendono identificabile il corpus; non si promette identità con NumPy a parità di seed.
 
@@ -72,6 +82,6 @@ Dominio geometrico 1–8 cabine e 1–50 piani sopra terra. Con un solo piano i 
 
 Il fattore 0,82 converte i posti pianificabili in un lotto equivalente di chiamate per decisione; è un’euristica documentata, **non throughput calibrato** nella finestra di 12 minuti. Il fit NNLS è diagnostico e non governa il parking. Non si tratta di una certificazione o di un controllo hardware.
 
-I budget del browser sono distinti dai vincoli matematici: 5.000 persone, corpus conservativo 500.000 richieste, 25.000 richieste/giorno; trace massimo 32 MiB o 150.000 eventi. Il superamento interrompe l’esperimento con errore esplicito; nessun campionamento o risultato parziale viene presentato come concluso. Questi massimali non sono una garanzia di velocità su tutti i dispositivi.
+I budget del browser sono distinti dai vincoli matematici: 5.000 persone, corpus conservativo 500.000 richieste, 25.000 richieste/giorno; trace massimo 32 MiB o 150.000 eventi. Se la sola registrazione dei movimenti supera il proprio budget, il confronto ripete quella corsa con gli stessi dati senza registrazione e lo segnala esplicitamente: tutte le richieste e le metriche restano calcolate, senza replay parziale. Gli altri limiti ed errori interrompono l’esperimento con un messaggio. Nessun campionamento o risultato parziale viene presentato come concluso. Questi massimali non sono una garanzia di velocità su tutti i dispositivi.
 
 Evidenza di verifica e limiti residui: [VALIDAZIONE.md](docs/VALIDAZIONE.md). Piano e specifiche: [docs/](docs/PROPOSTA-FASE-A.md). Nessun deployment pubblico viene eseguito dai comandi di setup.

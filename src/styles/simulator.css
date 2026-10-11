@@ -3,6 +3,7 @@
 @media(max-width:600px){.config-heading{align-items:flex-start;flex-direction:column}.building-inputs,.capacity-list,.advanced-grid{grid-template-columns:1fr;gap:22px}.people-inputs{grid-template-columns:1fr 1fr}.people-inputs>.quiet-button{grid-column:1/-1}.summary-grid{grid-template-columns:1fr}.result-card{padding:18px 0}.result-card>strong{font-size:52px}.result-card dl{margin-top:16px}.interpretation{padding:22px 18px}.timeline-row{grid-template-columns:74px minmax(0,1fr) 72px;gap:8px;font-size:11px}.timeline-row>strong{font-size:11px}.simple-example-controls{gap:16px}.simple-example-controls label{font-size:12px}.config-intro{font-size:15px}.run-actions .button{width:100%;justify-content:center}.cabins-state>div{padding:12px}.floor-bar{grid-template-columns:66px minmax(2px,1fr) 84px;gap:8px}.simulation-results{padding-top:64px}.result-downloads{gap:10px}.configuration-tools{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){.simulator *,.automation-example *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
+.office-table .number-field{position:relative}
 .simulator form,.scenario-summary,.result-card,.simple-example-controls{border-top-color:var(--ocean)}
 .mass-badge,.quiet-button{border-color:var(--ocean)}
 .quiet-button:hover{background:var(--ocean-soft)}

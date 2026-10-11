@@ -40,6 +40,6 @@ export type TraceSelection = { policy: PolicyId; seed: Seed } | null;
 export type WorkerIn = { type: 'RUN'; jobId: string; scenario: ScenarioV2; policies: readonly PolicyId[]; traceFor: TraceSelection }
   | { type: 'EXPLAIN'; jobId: string; scenario: ScenarioV2; dataset: Dataset }
   | { type: 'CANCEL'; jobId: string };
-export type WorkerOut = { type: 'PROGRESS'; jobId: string; phase: 'training'|'fitting'|'simulation'; timeS?: Seconds; processedEvents: number; completedRuns?: number; totalRuns?: number }
+export type WorkerOut = { type: 'PROGRESS'; jobId: string; phase: 'training'|'fitting'|'simulation'; timeS?: Seconds; simulationTimeS?: Seconds; policy?: PolicyId; seed?: string; recordingUnavailable?: boolean; processedEvents: number; completedRuns?: number; totalRuns?: number }
   | { type: 'DONE'; jobId: string; experiment: ExperimentResult } | { type: 'CANCELLED'; jobId: string }
   | { type: 'ERROR'; jobId: string; kind: 'invalid'|'unsupported'|'numerical'|'internal'; issues: readonly Issue[] };

@@ -51,7 +51,7 @@ Dati, seed e hash: [reference-summary.json](validation/reference-summary.json), 
 - `optimal` è greedy locale, `fifo` baseline euristica; niente FIFO stretto, ottimo globale, MPC implementato o controllo hardware implicito.
 - Il DES parte all’inizio dell’orizzonte con cabine vuote al piano 0 e termina senza drain. Le statistiche sui passeggeri completati, gli incompleti WAIT/ONBOARD e i contatori della flotta hanno denominatori distinti.
 - NNLS è diagnostica; il forecast degli uffici usa training/holdout disgiunti. La previsione conserva le ipotesi sintetiche e il clipping/bias dichiarati della fonte.
-- Budget ingegneristici: 5.000 persone, 25.000 chiamate/giorno, 500.000 richieste conservative per corpus, 192 run, 20.000 bin fit; DES massimo 1.000.000 eventi, trace 32 MiB/150.000 eventi. Superamento = errore esplicito, senza ridurre domanda, seed o trace tacitamente. Non sono limiti di validità matematici né garanzie di performance.
+- Budget ingegneristici: 5.000 persone, 25.000 chiamate/giorno, 500.000 richieste conservative per corpus, 192 run, 20.000 bin fit; DES massimo 1.000.000 eventi, trace 32 MiB/150.000 eventi. Il confronto recupera soltanto il limite della registrazione selezionata ricalcolando la stessa corsa senza trace, con avviso esplicito; gli altri superamenti restano errori. Nessuna riduzione tacita di domanda o seed, nessun risultato o replay parziale. Non sono limiti di validità matematici né garanzie di performance.
 - Gli originali, inclusi risultati a pesi variabili, sono in `reference/source/`; le fixture e i risultati V2 rimangono distinti. Grafici e KPI dell’applicazione sono ricalcolati a ogni esperimento.
 
 ## Ambiente e consegna
@@ -79,3 +79,13 @@ Verifiche eseguite: **128 test numerici e dei vincoli in 17 file; 15 test browse
 Per richiesta dell’utente, gli uffici iniziali, aggiunti o ricreati partono dal **100% di partecipazione al pranzo**, rappresentato come `1` nel modello. La percentuale rimane modificabile; importazioni e riesecuzioni conservano i valori personalizzati. Le fonti originali rimangono integre. Il caso storico fixed80 del 9 ottobre applica esplicitamente il 72% nel proprio test, così i risultati documentati sopra restano riproducibili e separati dal nuovo preset.
 
 **128 test in 17 file e 16 test browser superati**. Il nuovo controllo browser verifica valori iniziali, aggiunta degli uffici, applicazione della distribuzione, ripristino e importazione di una configurazione con partecipazione personalizzata. Build TypeScript/Vite e preparazione Pages completate; controllo della build statica locale sotto `/elevator/` superato, inclusi PDF, risorse, due confronti, esempio interattivo, navigazione, esportazioni e layout mobile.
+
+## Correzione del simulatore e revisione generale — 11 ottobre 2026
+
+Quattro specialisti distinti hanno curato performance, Worker, interfaccia e verifica numerica indipendente. La revisione del coordinatore ha verificato invalidazione delle cache, copia del piano vincente, ordine degli inserimenti, recupero selettivo della registrazione e gestione dei risultati precedenti. Modello e dipendenze restano invariati.
+
+**200 test in 20 file; 22 prove browser in Chromium e 22 in WebKit Linux; TypeScript, build e controllo della build statica sotto `/elevator/` superati.** I 55 test indipendenti confrontano anche 33 risultati originali completi, con 36.257 eventi trace e 4.594 RETRY, conservati prima degli edit con provenienza SHA-256. Le nuove prove riproducono un tentativo invalido, annullamento, errore, progresso interno e recupero della registrazione, oltre alla configurazione pesante reale.
+
+30 piani, 4 cabine, 90 uffici, 20 persone per ufficio, pranzo 100%: tutte le otto giornate / 24 risultati terminano in circa **145,1 s Chromium e 227,4 s WebKit** nell’ambiente di prova. La registrazione richiesta supera il budget e viene dichiarata indisponibile; il ricalcolo conserva le metriche e tutte le richieste. Un secondo confronto con 8 cabine e 180 persone termina nello stesso documento. I KPI dei 24 risultati coincidono fra i due browser; le richieste incomplete restano rappresentate. WebKit Linux non equivale a una prova su Safari Mac fisico; le durate non sono promesse per altri dispositivi.
+
+Dettagli, limiti e metodologia: [diagnosi e revisione](DIAGNOSI-SIMULATORE-2026-10-11.md). Riepiloghi delle prove browser: [simulator-fix-2026-10-11.json](validation/simulator-fix-2026-10-11.json). Il push non attiva il workflow di pubblicazione manuale.

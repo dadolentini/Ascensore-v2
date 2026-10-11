@@ -6,7 +6,7 @@ import { generateDataset } from '../model/demand';
 import { deriveCapacities } from '../model/physics';
 import { estimateOfficeModels, officeHoldoutMae } from '../model/officeModel';
 import { fitFlow } from '../model/flowFit';
-import { simulate } from '../engine';
+import { simulate, SimulationError } from '../engine';
 
 export const MANUAL_GENERATOR_VERSION = 'manual.fixed80.1';
 export const RESOURCE_LIMITS = Object.freeze({ people: 5000, requestsPerDay: 25000, days: 64, estimatedCorpusRequests: 500000, runs: 192, fitBins: 20000 });
@@ -113,7 +113,19 @@ export async function runExperiment(value: ScenarioV2, policyValues: readonly Po
   const results: PolicyResult[] = [], totalRuns = datasets.length * policies.length;
   onProgress?.({ phase: 'simulation', processedEvents: 0, completedRuns: 0, totalRuns });
   for (const dataset of datasets) for (const policy of policies) {
-    results.push(simulate(scenario, dataset, policy, context, trace?.seed === dataset.seed && trace.policy === policy));
+    const traceEnabled = trace?.seed === dataset.seed && trace.policy === policy;
+    let recordingUnavailable = false;
+    const report: Parameters<typeof simulate>[5] = onProgress ? progress => onProgress({ phase: 'simulation', ...progress, completedRuns: results.length, totalRuns, policy, seed: dataset.seed, ...(recordingUnavailable ? { recordingUnavailable: true } : {}) }) : undefined;
+    let result: PolicyResult;
+    try { result = simulate(scenario, dataset, policy, context, traceEnabled, report); }
+    catch (error) {
+      if (!traceEnabled || !(error instanceof SimulationError) || error.kind !== 'unsupported' || !error.issues.some(issue => issue.code === 'resource-trace')) throw error;
+      recordingUnavailable = true;
+      // Discard the failed recording and repeat the same complete run; never return a partial trace.
+      result = simulate(scenario, dataset, policy, context, false, report);
+      issues.push({ code: 'trace-unavailable', path: `results.${policy}.${dataset.seed}.trace`, message: `La registrazione dei movimenti della giornata con codice ${dataset.seed} ha superato il limite di memoria. La stessa simulazione è stata ricalcolata senza registrazione, conservando tutte le richieste e le metriche. Nessuna registrazione parziale è disponibile.`, details: { policy, seed: dataset.seed, reason: 'resource-trace' } });
+    }
+    results.push(result);
     onProgress?.({ phase: 'simulation', processedEvents: 0, completedRuns: results.length, totalRuns });
   }
   return { scenario, datasets, results, metricPopulations: { ...metricPopulations }, flowFit: fit, officeEstimates, officeHoldoutMae: officeMae, diagnosticsIssues: [...issues, ...diagnostics(scenario, results)] };

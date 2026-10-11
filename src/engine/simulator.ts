@@ -3,7 +3,7 @@ import { deriveCapacities, travelSeconds } from '../model/physics';
 import { canonicalStringify } from '../model/reproducibility';
 import { floorDemand } from '../model/officeModel';
 import { EventHeap, type ScheduledEvent } from './heap';
-import { chooseAssignment, taskFloor, type CarState, type Task } from './routing';
+import { chooseAssignment, taskFloor, type AssignmentRouteCache, type CarState, type Task } from './routing';
 import { chooseGrouping, hourlyParkingFloor } from './parking';
 import { SimulationError } from './errors';
 
@@ -12,6 +12,7 @@ const MAX_EVENTS=1_000_000;
 const MAX_TRACE_BYTES=32*1024*1024;
 const MAX_TRACE_EVENTS=150_000;
 interface BlockedRequest { signature:string; rejectedCarId?:number; }
+export interface SimulationProgress { processedEvents:number; simulationTimeS:number; }
 const link=(equationId:string,symbolValues:Record<string,number>,codeRef:string,outputField:string):TraceLink=>({equationId,symbolValues,codeRef,outputField});
 
 function validate(scenario:ScenarioV2,dataset:Dataset,policy:PolicyId,context:SimulationContext):void {
@@ -44,7 +45,7 @@ function percentile(values:readonly number[],p:number):number|null {
 function average(values:readonly number[]):number|null {return values.length?values.reduce((a,b)=>a+b,0)/values.length:null;}
 
 /** Finite DES: transfers occur at ARRIVE, before the shared door/transfer dwell. No drain. */
-export function simulate(scenario:ScenarioV2,dataset:Dataset,policy:PolicyId,context:SimulationContext,traceEnabled:boolean):PolicyResult {
+export function simulate(scenario:ScenarioV2,dataset:Dataset,policy:PolicyId,context:SimulationContext,traceEnabled:boolean,onProgress?:(progress:SimulationProgress)=>void):PolicyResult {
   validate(scenario,dataset,policy,context);
   const cars:CarState[]=scenario.cabins.map(c=>({id:c.id,floor:0,nextFloor:null,mode:'idle',onboardIds:[],actualWeightKg:0,departureS:null,arrivalS:null,eventVersion:0,doorEndS:null,idleSinceS:scenario.startS,plan:[]}));
   const carById=new Map(cars.map(c=>[c.id,c]));
@@ -56,8 +57,17 @@ export function simulate(scenario:ScenarioV2,dataset:Dataset,policy:PolicyId,con
   const heap=new EventHeap(),blocked=new Map<number,BlockedRequest>();
   const parkingPending=new Map<number,number>(),parkingEvaluated=new Map<number,string>();
   let now=scenario.startS,activeEvent:ScheduledEvent|null=null,traceBytes=0,processedEvents=0;
+  let lastProgressMs=-Infinity;
   let bypasses=0,distanceFloors=0,parkingFloors=0,doorStops=0,adaptiveParkingDecisions=0,maxGroupedSameFloor=0;
   for(const request of outcomes) heap.push({timeS:request.bornS,kind:'NEW',requestId:request.id});
+
+  function reportProgress(force=false):void {
+    if(!onProgress) return;
+    const wallMs=performance.now();
+    if(!force&&wallMs-lastProgressMs<150) return;
+    lastProgressMs=wallMs;
+    onProgress({processedEvents,simulationTimeS:now});
+  }
 
   function emit(kind:TraceEvent['kind'],car?:CarState,request?:RequestOutcome,links:TraceLink[]=[],extra:Partial<TraceEvent>={}):void {
     if(!trace) return;
@@ -69,11 +79,12 @@ export function simulate(scenario:ScenarioV2,dataset:Dataset,policy:PolicyId,con
   function stateSignature():string {
     return cars.map(c=>`${c.id}:${c.eventVersion}:${c.mode}:${c.floor}:${c.onboardIds.join(',')}:${c.plan.map(t=>t.kind==='R'?`R${t.floor}`:`${t.kind}${t.requestId}`).join(',')}`).join('|');
   }
-  function assign(request:RequestOutcome,alternativeEta=false,excludedCarId?:number):boolean {
-    const choice=chooseAssignment(request,cars,requests,scenario,context.capacityByCar,now,policy,alternativeEta,excludedCarId);
+  function assign(request:RequestOutcome,alternativeEta=false,excludedCarId?:number,routeCache?:AssignmentRouteCache):boolean {
+    const choice=chooseAssignment(request,cars,requests,scenario,context.capacityByCar,now,policy,alternativeEta,excludedCarId,routeCache);
     if(!choice) return false;
     const car=carById.get(choice.carId)!;
     car.plan=choice.plan; request.assignedCarId=car.id;
+    routeCache?.delete(car.id);
     const values={t_s:now,a_r_s:request.bornS,pick_hat_s:choice.evaluation.pickups.get(request.id)!,drop_hat_s:choice.evaluation.drops.get(request.id)!,eta_s:choice.etaS,ride_s:choice.rideS,induced_delay_s:choice.inducedDelayS,J_before_s:choice.beforeCost,J_after_s:choice.evaluation.cost,delta_J_s:choice.deltaCost,score_s:choice.score,alpha:scenario.dispatch.rideTimeFactor,zeta:scenario.dispatch.lateWaitFactor,w0_s:scenario.dispatch.fairnessThresholdS,mass_kg:80,rho:.96};
     emit('ASSIGN',car,request,[link(alternativeEta?'D3-ETA':policy==='fifo'?'SOURCE-FIFO':'EQ9-10',values,'src/engine/routing.ts:chooseAssignment','assignedCarId')]);
     return true;
@@ -90,13 +101,20 @@ export function simulate(scenario:ScenarioV2,dataset:Dataset,policy:PolicyId,con
     car.mode='idle';car.idleSinceS=now;car.eventVersion++;car.nextFloor=null;car.departureS=null;car.arrivalS=null;car.doorEndS=null;
   }
   function retryAll():void {
+    // Failed assignments leave the fleet unchanged. Reuse its exact signature
+    // until a successful insertion changes a plan; iteration order is preserved.
+    let signature:string|undefined,retries=0;
+    // All these attempts share now and request states. Failed attempts change
+    // nothing; successful ones invalidate only the selected cabin's route.
+    const routeCache:AssignmentRouteCache=new Map();
     for(const [id,retry] of blocked) {
+      if((++retries&31)===0) reportProgress();
       const request=requests.get(id)!;
       if(request.state!=='WAIT') {blocked.delete(id);continue;}
-      const signature=stateSignature();
+      signature??=stateSignature();
       if(signature===retry.signature) continue;
-      emit('RETRY',undefined,request,[link('D3',{mass_kg:80,alternative_eta:retry.rejectedCarId===undefined?0:1},'src/engine/simulator.ts:retryAll','assignedCarId')]);
-      if(assign(request,retry.rejectedCarId!==undefined,retry.rejectedCarId)) blocked.delete(id);
+      if(trace) emit('RETRY',undefined,request,[link('D3',{mass_kg:80,alternative_eta:retry.rejectedCarId===undefined?0:1},'src/engine/simulator.ts:retryAll','assignedCarId')]);
+      if(assign(request,retry.rejectedCarId!==undefined,retry.rejectedCarId,routeCache)) {blocked.delete(id);signature=undefined;}
       else retry.signature=signature;
     }
     for(const car of cars) schedule(car);
@@ -148,12 +166,14 @@ export function simulate(scenario:ScenarioV2,dataset:Dataset,policy:PolicyId,con
     } else {setIdle(car);emit('ARRIVE',car);schedule(car);}
     retryAll();
   }
+  reportProgress(true);
   armParking();
   while(heap.size) {
     const event=heap.pop()!;
     if(event.timeS>scenario.endS) break;
     now=event.timeS;activeEvent=event;
     if(++processedEvents>MAX_EVENTS) throw new SimulationError('unsupported','resource-events','Processed-event limit exceeded; no partial run returned');
+    reportProgress();
     if(event.kind==='NEW') {
       const request=requests.get(event.requestId)!;
       emit('NEW',undefined,request,[],{fromFloor:request.origin,toFloor:request.destination});
@@ -199,5 +219,6 @@ export function simulate(scenario:ScenarioV2,dataset:Dataset,policy:PolicyId,con
   const waits=completed.map(r=>r.pickupS!-r.bornS),rides=completed.map(r=>r.finishS!-r.pickupS!),journeys=completed.map(r=>r.finishS!-r.bornS);
   const waiting=outcomes.filter(r=>r.state==='WAIT').length,onboard=outcomes.filter(r=>r.state==='ONBOARD').length;
   const kpis:Kpis={generated:outcomes.length,pickedUp:completed.length+onboard,completed:completed.length,waiting,onboard,unfinished:waiting+onboard,servedPct:outcomes.length?100*completed.length/outcomes.length:0,meanWaitS:average(waits),medianWaitS:percentile(waits,.5),p90WaitS:percentile(waits,.9),p95WaitS:percentile(waits,.95),waitOver120Pct:completed.length?100*waits.filter(w=>w>120).length/completed.length:null,meanRideS:average(rides),meanJourneyS:average(journeys),bypasses,distanceFloors,parkingFloors,doorStops,adaptiveParkingDecisions,maxGroupedSameFloor};
+  reportProgress(true);
   return {policy,seed:dataset.seed,datasetHash:dataset.datasetHash,modelVersion:scenario.modelVersion,kpis,outcomes,initialSnapshot,trace};
 }
