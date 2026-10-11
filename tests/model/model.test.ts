@@ -9,10 +9,11 @@ import { learnOfficeModels, floorDemand } from '../../src/model/officeModel';
 import { fitFlow } from '../../src/model/flowFit';
 
 describe('numerical reference and fixed80 physics', () => {
-  it('resolves source defaults without latent uniform population assumptions', () => {
+  it('resolves source geometry and population with 100% lunch participation by default', () => {
     const s = createDefaultScenario();
     expect(s.offices.length).toBe(30); expect(s.offices.reduce((n,o)=>n+o.employees,0)).toBe(525);
-    expect(s.offices[0]).toEqual({id:'U12-FOCUS',floor:12,employees:65,lunchStartHour:13,lunchParticipation:.72});
+    expect(s.offices[0]).toEqual({id:'U12-FOCUS',floor:12,employees:65,lunchStartHour:13,lunchParticipation:1});
+    expect(s.offices.every(office=>office.lunchParticipation===1)).toBe(true);
     expect(validateScenario(s).ok).toBe(true);
   });
   it('preserves triangular / cruise transition and heterogeneous capacity thresholds', () => {

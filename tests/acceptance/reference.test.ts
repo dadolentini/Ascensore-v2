@@ -4,8 +4,10 @@ import { createDefaultScenario } from '../../src/model/defaults';
 import { runExperiment } from '../../src/worker/runner';
 import { aggregatePolicies } from '../../src/features/results/data';
 
-test('riferimento fixed80: 24 run complete, corpus condivisi e trace verificabile',async()=>{
+test('riferimento storico fixed80 con pranzo al 72%: 24 run complete, corpus condivisi e trace verificabile',async()=>{
   const started=performance.now(),scenario=createDefaultScenario();
+  // Keep the documented 9 October reference reproducible independently of UI presets.
+  scenario.offices=scenario.offices.map(office=>({...office,lunchParticipation:.72}));
   const experiment=await runExperiment(scenario,['fifo','optimal','adaptive'],{policy:'adaptive',seed:'101'});
   expect(experiment.datasets).toHaveLength(8);expect(experiment.results).toHaveLength(24);
   for(const dataset of experiment.datasets){

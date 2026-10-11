@@ -51,7 +51,8 @@ Verificare l’indirizzo definitivo con `npm run test:deployment`. Per una verif
 
 ## Uso
 
-- Configura piani, ascensori e persone; **Distribuisci gli uffici** applica esplicitamente la distribuzione dichiarata. Gli uffici preesistenti non vengono spostati tacitamente quando cambi i piani.
+- Configura piani, ascensori e persone; **Applica la distribuzione** crea gli uffici con i valori indicati e sostituisce la lista attuale. I nuovi valori vengono applicati anche all’avvio del confronto. Cambiare soltanto i piani conserva gli uffici già inseriti.
+- La partecipazione al pranzo parte dal **100%** per gli uffici iniziali, aggiunti o ricreati; rimane modificabile per ogni ufficio. Le configurazioni importate conservano le percentuali salvate. **Scarica configurazione** salva un file sul dispositivo; **Importa configurazione** riapre quel file.
 - Le opzioni avanzate espongono uffici individuali, pause, portata/posti per cabina, caratteristiche fisiche, orari e repliche.
 - Esegui, modifica e riesegui senza reload. Puoi annullare e ripartire. Il worker viene terminato e sostituito a ogni run; i risultati precedenti rimangono identificati fino alla nuova conclusione. Navigare nelle altre pagine conserva bozza e risultati del simulatore.
 - **Come funziona** calcola un caso controllato con lo stesso motore, timeline per persona, carico in kg, decisioni e replay. **Gli algoritmi** conduce a formule, unità, limiti e collegamenti al codice.

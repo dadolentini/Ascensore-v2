@@ -8,7 +8,7 @@ async function configureSmall(page:Page,navigate=true) {
   await page.getByLabel('Piani sopra terra',{exact:true}).fill('3');
   await page.getByLabel('Uffici per piano',{exact:true}).fill('1');
   await page.getByLabel('Persone per ufficio',{exact:true}).fill('2');
-  await page.getByRole('button',{name:'Distribuisci gli uffici',exact:true}).click();
+  await page.getByRole('button',{name:'Applica la distribuzione',exact:true}).click();
   await page.getByText('Giornate e impostazioni del confronto',{exact:true}).click();
   await page.getByLabel('Giornate da confrontare',{exact:true}).fill('1');
 }
@@ -86,11 +86,11 @@ test('partecipazione in percentuale, conversione del dato e limiti senza cambiar
   await configureSmall(page);
   await page.getByText('Personalizza uffici e pause',{exact:true}).click();
   const participation=page.getByLabel('Partecipazione ufficio 1',{exact:true});
-  await expect(participation).toHaveValue('72');
+  await expect(participation).toHaveValue('100');
   for(const percentage of [0,29,71.5,100]) {
     await participation.fill(String(percentage));
     const pending=page.waitForEvent('download');
-    await page.getByRole('button',{name:'Salva configurazione',exact:true}).click();
+    await page.getByRole('button',{name:'Scarica configurazione',exact:true}).click();
     const download=await pending,scenario=JSON.parse(await readFile((await download.path())!,'utf8')) as ScenarioV2;
     expect(scenario.offices[0].lunchParticipation).toBe(percentage/100);
   }
@@ -101,6 +101,30 @@ test('partecipazione in percentuale, conversione del dato e limiti senza cambiar
   const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Dati completi JSON',exact:false}).click();
   const download=await pending,experiment=JSON.parse(await readFile((await download.path())!,'utf8')) as ExperimentResult;
   expect(experiment.scenario.offices[0].lunchParticipation).toBe(.5);
+});
+test('partecipazione al 100% per uffici iniziali, aggiunti, distribuiti e ripristinati',async({page})=>{
+  await page.goto('/#simulatore');
+  await page.getByText('Personalizza uffici e pause',{exact:true}).click();
+  const inputs=page.locator('.office-table input[name$=".lunchParticipation"]');
+  const values=()=>inputs.evaluateAll(elements=>elements.map(element=>(element as HTMLInputElement).value));
+  expect(await values()).toEqual(Array(30).fill('100'));
+  await page.getByRole('button',{name:'Aggiungi un ufficio',exact:true}).click();
+  expect(await values()).toEqual(Array(31).fill('100'));
+  await page.getByLabel('Piani sopra terra',{exact:true}).fill('3');
+  await page.getByLabel('Uffici per piano',{exact:true}).fill('1');
+  await page.getByLabel('Persone per ufficio',{exact:true}).fill('2');
+  await page.getByRole('button',{name:'Applica la distribuzione',exact:true}).click();
+  expect(await values()).toEqual(['100','100','100']);
+  await page.getByLabel('Partecipazione ufficio 1',{exact:true}).fill('29');
+  await page.getByText('Giornate e impostazioni del confronto',{exact:true}).click();
+  const pending=page.waitForEvent('download');
+  await page.getByRole('button',{name:'Scarica configurazione',exact:true}).click();
+  const download=await pending,path=(await download.path())!;
+  await page.getByRole('button',{name:'Ripristina i valori iniziali',exact:true}).click();
+  expect(await values()).toEqual(Array(30).fill('100'));
+  await page.locator('.import-label input[type="file"]').setInputFiles({name:'configurazione.json',mimeType:'application/json',buffer:await readFile(path)});
+  await expect(inputs).toHaveCount(3);
+  expect(await values()).toEqual(['29','100','100']);
 });
 test('punti del grafico e confronto base/adattivo corrispondono ai risultati esportati',async({page})=>{
   await configureSmall(page);await run(page);
@@ -139,7 +163,7 @@ test('quattro simulazioni consecutive senza reload, con nuovi input e bozza cons
   await run(page);const firstHash=await page.locator('.dataset-hashes li').first().textContent();
   await page.getByLabel('Numero di ascensori',{exact:true}).fill('1');await expect(page.locator('.previous-notice')).toBeVisible();
   await run(page);expect(await page.locator('.dataset-hashes li').first().textContent()).toBe(firstHash);
-  await page.getByLabel('Persone per ufficio',{exact:true}).fill('3');await page.getByRole('button',{name:'Distribuisci gli uffici',exact:true}).click();await run(page);
+  await page.getByLabel('Persone per ufficio',{exact:true}).fill('3');await page.getByRole('button',{name:'Applica la distribuzione',exact:true}).click();await run(page);
   expect(await page.locator('.dataset-hashes li').first().textContent()).not.toBe(firstHash);
   await page.getByLabel('Giornate da confrontare',{exact:true}).fill('2');await run(page);await expect(page.locator('.dataset-hashes li')).toHaveCount(2);
   await page.getByRole('navigation',{name:'Navigazione principale'}).getByRole('link',{name:'Come funziona',exact:true}).click();

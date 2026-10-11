@@ -28,6 +28,7 @@
 
 - Esperienza premium 2D; niente Three.js, scene 3D o camera virtuale. Navigazione visibile «Gli algoritmi».
 - Integrazioni approvate: landing con spiegazioni semplici e meno matematica; pagina esterna «Come funziona» con automazione interattiva, grafici reali e passaggio graduale al tecnico; PDF originale apribile. Riesecuzioni consecutive e annullamento senza reload; mantenere la bozza durante la navigazione.
+- Aggiornamento 11 ottobre 2026: il pulsante del configuratore è «Applica la distribuzione». La partecipazione al pranzo è preimpostata al 100% negli uffici iniziali, aggiunti e ricreati; resta modificabile. Importare una configurazione conserva i valori salvati. Il riferimento numerico storico del 9 ottobre mantiene esplicitamente il 72%, distinto dal nuovo preset dell’interfaccia.
 - Formule autentiche con unità e spiegazioni; grafici con titolo, unità e alternativa tabellare accessibile.
 - Tastiera, contrasti WCAG AA, mobile, `prefers-reduced-motion`, stato vuoto/caricamento/errore e annullamento sono requisiti.
 - Deleghe con ownership delimitata. L'architettura del motore dipende dalla specifica matematica; UX e motion devono concordare il medesimo flusso.

@@ -38,7 +38,7 @@ try {
   await page.getByLabel('Piani sopra terra',{exact:true}).fill('3');
   await page.getByLabel('Uffici per piano',{exact:true}).fill('1');
   await page.getByLabel('Persone per ufficio',{exact:true}).fill('2');
-  await page.getByRole('button',{name:'Distribuisci gli uffici',exact:true}).click();
+  await page.getByRole('button',{name:'Applica la distribuzione',exact:true}).click();
   await page.getByText('Giornate e impostazioni del confronto',{exact:true}).click();
   await page.getByLabel('Giornate da confrontare',{exact:true}).fill('1');
   async function run(){

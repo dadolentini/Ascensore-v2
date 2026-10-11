@@ -3,7 +3,8 @@ import type { ScenarioV2 } from './contracts';
 export const MODEL_VERSION = 'v2.fixed80.corrected.1';
 export const GENERATOR_VERSION = 'v2.sfc32.boxmuller.fixed80.1';
 
-/** Source defaults, with the approved deterministic 80kg profile.
+/** Source geometry and population, with the approved deterministic 80kg profile.
+ * The UI starts with the user-requested 100% lunch participation; original sources stay intact.
  * The source's automatic office distribution is resolved into an explicit list.
  */
 export function createDefaultScenario(): ScenarioV2 {
@@ -19,9 +20,9 @@ export function createDefaultScenario(): ScenarioV2 {
     learning: {habitSdMinutes:9,dailyJitterMinutes:2.5,priorEvents:22,priorWorkerDays:12,forecastHorizonMinutes:12,
       leadMinutes:3,reserveIdleCars:1,effectiveCapacityFraction:.82,minPredictedCalls:3,movementPenaltyPerS:.1,
       coveragePenalty:.1,maxGroupedCarsPerFloor:3},
-    offices: [{id:'U12-FOCUS',floor:12,employees:65,lunchStartHour:13,lunchParticipation:.72},
+    offices: [{id:'U12-FOCUS',floor:12,employees:65,lunchStartHour:13,lunchParticipation:1},
       ...Array.from({length:29},(_,i)=>({id:`U${String(i+1).padStart(2,'0')}`,floor:i%15+1,
-        employees:i<25?16:15,lunchStartHour:lunchHours[(i*7+i%15+1)%3],lunchParticipation:.72}))],
+        employees:i<25?16:15,lunchStartHour:lunchHours[(i*7+i%15+1)%3],lunchParticipation:1}))],
     seeds: {simulation:['101','202','303','404','505','606','707','808'],habits:'917',
       training:Array.from({length:12},(_,i)=>String(1101+i)),validation:Array.from({length:4},(_,i)=>String(2201+i))},
     startS:7*3600,endS:21*3600,fitTrainingDays:6,arrivalBinMinutes:10,chartBinMinutes:30,
