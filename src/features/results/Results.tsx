@@ -17,7 +17,7 @@ export default function Results({experiment,previous}:{experiment:ExperimentResu
   const policy=summaries.some(s=>s.policy===selectedPolicy)?selectedPolicy:summaries[0]?.policy;
   const chosen=experiment.results.find(r=>r.seed===day?.seed&&r.policy===policy);
   const traced=experiment.results.find(r=>r.trace!==null);
-  const recordingIssue=experiment.diagnosticsIssues.find(issue=>issue.code==='trace-unavailable');
+  const visibleDiagnostics=experiment.diagnosticsIssues.filter(issue=>issue.code!=='trace-unavailable');
   const tracedDay=traced?experiment.datasets.findIndex(d=>d.seed===traced.seed)+1:0;
   const comparisonMetrics=[{key:'meanWaitS',label:'Attesa prima di salire'},{key:'meanRideS',label:'Viaggio in cabina'},{key:'meanJourneyS',label:'Tempo totale (attesa + viaggio)'}] as const;
   function difference(base:number|null,value:number|null) {
@@ -34,7 +34,6 @@ export default function Results({experiment,previous}:{experiment:ExperimentResu
   return <section id="risultati" className="simulation-results" aria-labelledby="results-title">
     <div className="result-heading"><div><p className="eyebrow">07 / {previous?'Confronto precedente':'Risultati calcolati'}</p><h2 id="results-title">Quanto si aspetta.<br/><em>Che cosa cambia.</em></h2></div><div className="result-downloads"><button type="button" className="quiet-button" onClick={()=>downloadJson(experiment,'ascensori-scenario-risultati.json')}>Dati completi JSON ↗︎</button><button type="button" className="quiet-button" onClick={()=>downloadCsv(experiment.results)}>Metriche CSV ↗︎</button></div></div>
     {previous&&<p className="previous-notice">Questi risultati appartengono al confronto precedente, l’ultimo completato. Premi “Esegui il confronto” per calcolare nuovi risultati.</p>}
-    {recordingIssue&&<div className="trace-unavailable-notice draft-warning" role="status"><p>Tutti i risultati {previous?'del confronto precedente':'del confronto'} sono stati calcolati. La registrazione dei movimenti richiesta non è disponibile.</p><p>{recordingIssue.message}</p></div>}
     <p>{experiment.scenario.cabins.length} ascensori · {experiment.scenario.upperFloors} piani sopra terra + piano terra · {experiment.scenario.offices.reduce((s,o)=>s+o.employees,0)} persone · {experiment.datasets.length} {experiment.datasets.length===1?'giornata simulata':'giornate simulate'}.</p>
     <p className="chart-note">Confrontiamo tre modi di organizzare gli stessi ascensori. Le persone fanno le stesse chiamate: cambia come vengono servite e dove aspettano le cabine libere.</p>
     <div className="summary-grid">{summaries.map(s=><article className="result-card" key={s.policy}>
@@ -70,6 +69,6 @@ export default function Results({experiment,previous}:{experiment:ExperimentResu
       {experiment.flowFit?<div className="table-scroll" role="region" tabIndex={0} aria-label="Controllo dei flussi, tabella scorribile"><table><caption>Approssimazione dei flussi (NNLS), usata per controllo: non decide dove spostare le cabine</caption><thead><tr><th>Flusso</th><th>Errore medio (MAE), richieste/min</th><th>R² nelle giornate di verifica</th></tr></thead><tbody>{(['up','down'] as const).map(key=><tr key={key}><th>{key==='up'?'Salita':'Discesa'}</th><td>{experiment.flowFit![key].mae?.toFixed(4).replace('.',',')??'Non disponibile'}</td><td>{experiment.flowFit![key].r2?.toFixed(4).replace('.',',')??'Non disponibile'}</td></tr>)}</tbody></table></div>:<p>Il controllo aggregato dei flussi non è disponibile: richiede almeno due giornate e parametri validi. Questo non impedisce la simulazione delle chiamate e la previsione degli uffici.</p>}
       <p>Versione del modello: <code>{experiment.scenario.modelVersion}</code>. Generatore degli arrivi: <code>{experiment.datasets[0]?.generatorVersion}</code>. I tre sistemi riusano le stesse chiamate. I codici SHA-256 sotto permettono di verificare che i dati siano identici.</p><ul className="dataset-hashes">{experiment.datasets.map((d,i)=><li key={d.seed}>Giornata {i+1}, codice {d.seed}: <code>{d.datasetHash}</code></li>)}</ul><p>Periodo simulato: {experiment.scenario.startS/3600}–{experiment.scenario.endS/3600} h. Al termine il calcolo si ferma, anche se qualcuno sta ancora aspettando o viaggiando. Gli orari del riposizionamento per fasce e dei viaggi interni conservano i limiti dichiarati del modello originale.</p>
     </details>
-    {experiment.diagnosticsIssues.length>0&&<details className="diagnostic-details"><summary>Limiti e controlli di questo confronto ({experiment.diagnosticsIssues.length})</summary><ul>{experiment.diagnosticsIssues.map((issue,i)=><li key={i}>{issue.message}</li>)}</ul></details>}
+    {visibleDiagnostics.length>0&&<details className="diagnostic-details"><summary>Limiti e controlli di questo confronto ({visibleDiagnostics.length})</summary><ul>{visibleDiagnostics.map((issue,i)=><li key={i}>{issue.message}</li>)}</ul></details>}
   </section>;
 }

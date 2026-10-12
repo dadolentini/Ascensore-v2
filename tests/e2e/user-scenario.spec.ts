@@ -43,8 +43,8 @@ test('30 piani e 1800 persone: confronto completo e nuova simulazione senza rica
   if(traced)expect(traced.trace!.length).toBeGreaterThan(0);
   else {
     expect(experiment.diagnosticsIssues.some(issue=>issue.code==='trace-unavailable')).toBe(true);
-    await expect(page.locator('.trace-unavailable-notice')).toBeVisible();
-    await expect(page.locator('.trace-unavailable-notice')).toContainText('registrazione');
+    await expect(page.locator('.trace-unavailable-notice')).toHaveCount(0);
+    await expect(page.locator('body')).not.toContainText('La registrazione dei movimenti');
   }
   for(const event of traced?.trace??[])for(const car of event.carChanges){
     const capacity=experiment.scenario.cabins.find(cabin=>cabin.id===car.id)!;

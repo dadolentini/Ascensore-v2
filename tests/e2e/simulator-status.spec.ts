@@ -160,7 +160,7 @@ test('la prima simulazione mostra giornata e avanzamento reale prima di completa
   await expect(page.locator('.run-status')).toContainText('Confronto completato.');
 });
 
-test('la registrazione indisponibile è spiegata durante il calcolo e nei risultati completi',async({page})=>{
+test('la registrazione indisponibile resta nel JSON senza avvisi nella pagina o variazioni dei risultati',async({page})=>{
   await page.addInitScript(()=>{
     const NativeWorker=window.Worker;
     window.Worker=class extends NativeWorker {
@@ -174,7 +174,7 @@ test('la registrazione indisponibile è spiegata durante il calcolo e nei risult
               // Model the genuine runner's trace fallback at its UI message boundary.
               receive?.call(this,new MessageEvent('message',{data:{...event.data,experiment:{...experiment,
                 results:experiment.results.map((row:object)=>({...row,trace:null,initialSnapshot:null})),
-                diagnosticsIssues:[...experiment.diagnosticsIssues,{code:'trace-unavailable',path:'traceFor',message:'La registrazione dei movimenti della giornata con codice 101 ha superato il limite di memoria. La stessa simulazione è stata ricalcolata senza registrazione, conservando tutte le richieste e le metriche.'}],
+                diagnosticsIssues:[...experiment.diagnosticsIssues,{code:'trace-unavailable',path:'traceFor',message:'La registrazione dei movimenti della giornata con codice 101 ha superato il limite di memoria. La stessa simulazione è stata ricalcolata senza registrazione, conservando tutte le richieste e le metriche.'},{code:'test-diagnostic',path:'results',message:'Controllo di prova conservato.'}],
               }}}));
             } else receive?.call(this,event);
           };
@@ -191,17 +191,24 @@ test('la registrazione indisponibile è spiegata durante il calcolo e nei risult
     };
   });
   await smallScenario(page);await page.locator('.run-actions button[type="submit"]').click();
-  await expect(page.locator('.recording-unavailable-notice')).toContainText('Il calcolo continua senza registrazione');
+  await expect(page.locator('.run-status')).toContainText('Simulazioni completate: 0 di 3');
+  await expect(page.locator('.recording-unavailable-notice')).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText('Il calcolo continua senza registrazione');
   await page.evaluate(()=>(window as unknown as {__releaseStatusFallback:()=>void}).__releaseStatusFallback());
   await expect(page.locator('.run-status')).toContainText('Confronto completato.');
-  await expect(page.locator('.trace-unavailable-notice')).toBeVisible();
-  await expect(page.locator('.trace-unavailable-notice')).toContainText('Tutti i risultati del confronto sono stati calcolati');
-  await expect(page.locator('.trace-unavailable-notice')).toContainText('registrazione dei movimenti');
-  await expect(page.locator('.trace-unavailable-notice')).toContainText('non è disponibile');
+  await expect(page.locator('.trace-unavailable-notice')).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText('Tutti i risultati del confronto sono stati calcolati');
+  await expect(page.locator('body')).not.toContainText('La registrazione dei movimenti');
   await expect(page.getByLabel('Registra chiamate e movimenti',{exact:false})).toBeChecked();
   await expect(page.locator('.result-card')).toHaveCount(3);
   await expect(page.locator('.replay-details')).toHaveCount(0);
   const experiment=await result(page);
   expect(experiment.results.map(row=>row.kpis)).toEqual(await page.evaluate(()=>(window as unknown as {__statusFallbackKpis:unknown}).__statusFallbackKpis));
   expect(experiment.diagnosticsIssues.some(issue=>issue.code==='trace-unavailable')).toBeTruthy();
+  const visibleIssues=experiment.diagnosticsIssues.filter(issue=>issue.code!=='trace-unavailable');
+  await expect(page.locator('.diagnostic-details summary')).toContainText(`(${visibleIssues.length})`);
+  await page.locator('.diagnostic-details summary').click();
+  await expect(page.getByText('Controllo di prova conservato.',{exact:true})).toBeVisible();
+  await expect(page.locator('.diagnostic-details li')).toHaveCount(visibleIssues.length);
+  await expect(page.locator('body')).not.toContainText('La registrazione dei movimenti');
 });
